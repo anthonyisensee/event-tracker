@@ -21,7 +21,7 @@ export class Service {
         const years = Math.floor(days / 365)
 
         const differenceUnits = ["year", "month", "day", "hour", "minute", "second"]
-        const differenceValues = [years, months % 365, days % 30, hours % 24, minutes % 60, seconds % 60]
+        const differenceValues = [years, months % 12, days % 30, hours % 24, minutes % 60, seconds % 60]
 
         const arrayOfDifferences = []
         
@@ -30,7 +30,7 @@ export class Service {
         differenceUnits.forEach((unit, index) => {
 
             // Don't include leading zeroes or their units in the array
-            encounteredNonZero = encounteredNonZero || differenceValues[index] != 0
+            encounteredNonZero = encounteredNonZero || differenceValues[index] !== 0
 
             if (encounteredNonZero) {
 
@@ -71,7 +71,7 @@ export class Service {
 
             for (let i = 0; i < difference_values.length; i++) {
 
-                if (difference_values[i] != 0) {
+                if (difference_values[i] !== 0) {
 
                     position_first_value_not_zero = i
 
@@ -88,8 +88,8 @@ export class Service {
                 let add_to_end_of_string = ", "    // Separator for most cases
 
                 const displaying_two_or_more_units = position_first_value_not_zero <= difference_values.length - 2
-                const is_and_concatenation = i == difference_values.length - 2
-                const displaying_only_two_units = position_first_value_not_zero == difference_values.length - 2
+                const is_and_concatenation = i === difference_values.length - 2
+                const displaying_only_two_units = position_first_value_not_zero === difference_values.length - 2
 
                 if (displaying_two_or_more_units && is_and_concatenation) {
 
@@ -105,7 +105,7 @@ export class Service {
 
                 }
 
-                const is_final_concatenation = i == difference_values.length - 1
+                const is_final_concatenation = i === difference_values.length - 1
 
                 if (is_final_concatenation) {
 
@@ -113,7 +113,7 @@ export class Service {
 
                 }
 
-                const this_unit_plural = difference_values[i] != 1
+                const this_unit_plural = difference_values[i] !== 1
 
                 if (this_unit_plural) {
 

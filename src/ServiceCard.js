@@ -9,7 +9,7 @@ const ServiceCard = (props) => {
 
     setTimeout(() => {
         setTimeSinceArray(service.timeSinceLastEventArray)
-    }, 500)
+    }, 1000)
 
     return (
         <div className="box">
@@ -20,13 +20,13 @@ const ServiceCard = (props) => {
                 {timeSinceArray
                     .map((time, index) => (
                     
-                    <div className="m-3" key={index}>
-                        <p className="number is-size-3">{time.number}</p>
-                        <p className="unit is-size-6">{time.unit}{time.number === 1 ? "" : "s"}</p>
+                    <div className="m-2" key={index}>
+                        <p className="number is-size-4">{time.number}</p>
+                        <p className="unit is-size-7">{time.unit}{time.number === 1 ? "" : "s"}</p>
                     </div>
                 ))}
             </div>
-            <div className="content has-text-centered">
+            <div className="content has-text-centered is-size-6">
                 <p>since the <Link>last event</Link>.</p>
             </div>
             <div className="buttons is-centered">
