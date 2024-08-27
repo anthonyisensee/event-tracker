@@ -25,11 +25,11 @@ const ServiceCard = (props) => {
                 ))}
             </div>
             <div className="content has-text-centered is-size-6">
-                <p>since the <Link to="/service">last event</Link></p>
+                <p>has passed since the <Link to="/service">last event</Link>.</p>
             </div>
             <div className="buttons is-centered">
-                <Link to={"/service"} className="button is-info">Details</Link>
-                <button className="button is-success">Log Event</button>
+                <Link to="/service" className="button">View Details</Link>
+                <Link to="/event/create" className="button is-warning">Log New Event</Link>
             </div>
         </div>
     );

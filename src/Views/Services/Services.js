@@ -1,6 +1,7 @@
-import ServiceCard from "./ServiceCard";
+import ServiceCard from "./ServiceCard"
 import { Event } from "../../Models/Event"
 import { Service } from "../../Models/Service"
+import { Link } from "react-router-dom"
 
 const Services = () => {
 
@@ -16,24 +17,28 @@ const Services = () => {
 
     const service = sampleService
 
-    const numCells = 11
+    const numCells = 5
 
     return (
-
-        <section className="section">
-            <div className="container fixed-grid has-1-cols-mobile has-2-cols-tablet has-3-cols-desktop has-3-cols-widescreen has-5-cols-fullhd">
+        <div>
+            <div className="content has-text-centered">
+                <h1>Tracked Services</h1>
+            </div>
+            <div className="fixed-grid has-1-cols-mobile has-2-cols-tablet has-3-cols-desktop has-3-cols-widescreen has-5-cols-fullhd">
                 <div className="grid">
                     {Array.from({ length: numCells }).map((item, index) => (
-                        <div className="cell">
+                        <div className="cell" key={index}>
                             <ServiceCard service={service} />
                         </div>
                     ))}
                 </div>
             </div>
-        </section>
-
-    );
+            <div className="buttons is-centered">
+                <Link to="/service/create" className="button is-success">Create New Service</Link>
+            </div>
+        </div>
+    )
 
 }
  
-export default Services;
+export default Services
