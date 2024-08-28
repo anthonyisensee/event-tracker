@@ -45,7 +45,7 @@ const Service = () => {
                 <p>has passed since the last event.</p>
             </div>
             <div className="buttons is-centered mt-6">
-                <Link to="edit" className="button">Edit Service</Link>
+                <Link to="/service/edit" state={{ service }} className="button">Edit Service</Link>
                 <button className="button is-danger">Delete Service</button>
             </div>
             <br />
