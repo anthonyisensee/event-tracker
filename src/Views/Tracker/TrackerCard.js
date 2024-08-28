@@ -1,20 +1,20 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
 
-const ServiceCard = (props) => {
+const TrackerCard = (props) => {
 
-    const service = props.service
+    const tracker = props.tracker
 
-    const [timeSinceArray, setTimeSinceArray] = useState(service.timeSinceLastEventArray)
+    const [timeSinceArray, setTimeSinceArray] = useState(tracker.timeSinceLastEventArray)
 
     setTimeout(() => {
-        setTimeSinceArray(service.timeSinceLastEventArray)
+        setTimeSinceArray(tracker.timeSinceLastEventArray)
     }, 1000)
 
     return (
         <div className="box">
             <div className="content has-text-centered">
-                <h3>{service.name}</h3>
+                <h3>{tracker.name}</h3>
             </div>
             <div className="time-since has-text-centered is-flex is-justify-content-center">
                 {timeSinceArray.map((time, index) => (
@@ -25,14 +25,14 @@ const ServiceCard = (props) => {
                 ))}
             </div>
             <div className="content has-text-centered is-size-6">
-                <p>has passed since the <Link to="/service">last event</Link>.</p>
+                <p>has passed since the <Link to="/tracker">last event</Link>.</p>
             </div>
             <div className="buttons is-centered">
-                <Link to="/service" className="button">View Details</Link>
+                <Link to="/tracker" className="button">View Details</Link>
                 <Link to="/event/create" className="button is-warning">Log New Event</Link>
             </div>
         </div>
     );
 }
  
-export default ServiceCard
+export default TrackerCard

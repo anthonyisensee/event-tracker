@@ -1,7 +1,7 @@
 import Input from "../../Shared/Bulma/Input"
 import { useNavigate } from "react-router-dom"
 
-const CreateService = () => {
+const CreateTracker = () => {
 
     const navigate = useNavigate()
 
@@ -16,10 +16,10 @@ const CreateService = () => {
     return (
         <div>
             <div className="content has-text-centered">
-                <h1>Create New Service</h1>
+                <h1>Create New Tracker</h1>
             </div>
             <form onSubmit={handleSubmit}>
-                <Input label="Service Name"/>
+                <Input label="Tracker Name"/>
                 <div className="buttons is-centered">
                     <button onClick={() => navigate(-1)} className="button">Cancel</button>
                     <button className="button is-success">Create</button>
@@ -30,4 +30,4 @@ const CreateService = () => {
 
 }
  
-export default CreateService
+export default CreateTracker

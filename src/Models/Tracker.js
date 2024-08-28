@@ -1,9 +1,9 @@
-export class Service {
+export class Tracker {
 
-    constructor(service) {
+    constructor(tracker) {
 
-        this.name = service.name ?? null
-        this.events = service.events ?? []
+        this.name = tracker.name ?? null
+        this.events = tracker.events ?? []
 
     }
 
