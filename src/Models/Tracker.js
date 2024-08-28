@@ -2,6 +2,7 @@ export class Tracker {
 
     constructor(tracker) {
 
+        this.id = tracker.id ?? null
         this.name = tracker.name ?? null
         this.events = tracker.events ?? []
 
