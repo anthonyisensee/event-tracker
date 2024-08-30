@@ -1,77 +1,118 @@
-export default class IndexedDB {
+function openDatabase() {
 
-    constructor() {
+    const databaseName = 'event-tracker'
+    const databaseCurrentVersion = 1
 
-        this.currentVersion = 1
-        this.databaseName = "event-tracker"
+    return new Promise((resolve, reject) => {
 
-        this.db = window.indexedDB.open(this.databaseName, this.currentVersion)
+        const request = window.indexedDB.open(databaseName, databaseCurrentVersion)
 
-        console.log("opened db")
-
-        this.db.onerror = (event) => {
-
-            const message = `IndexedDB error: ${event.target.error?.message}`
-
-            console.error(message)
-
-            throw new Error(message)
-
-        }
-
-        this.db.onupgradeneeded = (event) => {
-
-            console.log("Beginning IDB onupgrade event.")
+        // When database version increase, run this function.
+        request.onupgradeneeded = (event) => {
 
             const db = event.target.result
 
             switch(event.oldVersion) {
 
+                // Database does not yet exist. Initialize the database.
                 case 0:
 
-                    // Database does not yet exist. Initialize database.
-
-                    db.createObjectStore("trackers", { keyPath: "id", autoIncrement: true })
+                    // Create tracker objectStore
+                    db.createObjectStore('trackers', { keyPath: 'id', autoIncrement: true })
                     
-                    const eventObjectStore = db.createObjectStore("events", { keyPath: "id", autoIncrement: true })
-                    eventObjectStore.index("trackerId")
-
-                default:
+                    // Create event objectStore with index on trackerId
+                    const eventObjectStore = db.createObjectStore('events', { keyPath: 'id', autoIncrement: true })
+                    eventObjectStore.createIndex('trackerId', 'trackerId', { unique: false })
 
             }
 
-            console.log("Completing IDB onupgrade event.")
+        }
+
+        // When opening the database works as expected resolve the promise and return the result
+        request.onsuccess = (event) => {
+
+            resolve(event.target.result)
 
         }
 
-        this.db.onsuccess = (event) => {
+        // When opening the database doesn't work reject the promise and return the error
+        request.onerror = (event) => {
 
-            console.log("Beginning IDB onsuccess event.")
-
-            const db = event.target.result
-
-            console.log("Completing IDB onsuccess event.")
+            reject(event.target.error)
 
         }
-        
-    }
 
-    // get(storeName, id) {
+    })
 
-    //     const objectStore = this.db
-    //         .transaction(storeName, "readonly")
-    //         .objectStore(storeName)
+}
 
-    //     if (id) {
+export async function addTracker(tracker) {
 
-    //         objectStore.get(id)
+    // Open the db and add the new tracker object
+    const db = await openDatabase()
+    const transaction = db.transaction('trackers', 'readwrite')
+    const objectStore = transaction.objectStore('trackers')
+    objectStore.add(tracker)
 
-    //     } else {
+    // Return a promise with either a resolution or a rejection and error message
+    return new Promise((resolve, reject) => {
 
-    //         objectStore.getAll()
+        transaction.oncomplete = () => resolve()
+        transaction.onerror = (event) => reject(event.target.error)
 
-    //     }
+    })
 
-    // }
+}
+
+export async function removeTracker(trackerId) {
+
+    // Open the db and remove the new tracker object
+    const db = await openDatabase()
+    const transaction = db.transaction('trackers', 'readwrite')
+    const objectStore = transaction.objectStore('trackers')
+    objectStore.delete(trackerId)
+
+    // Return a promise with either a resolution or a rejection and error message
+    return new Promise((resolve, reject) => {
+
+        transaction.oncomplete = () => resolve()
+        transaction.onerror = (event) => reject(event.target.error)
+
+    })
+
+}
+
+export async function getAllTrackers() {
+
+    const db = await openDatabase()
+    const transaction = db.transaction('trackers', 'readonly')
+    const objectStore = transaction.objectStore('trackers')
+    const request = objectStore.getAll()
+
+    // Return a promise with either a resolution and the data or a rejection and error message
+    return new Promise((resolve, reject) => {
+
+        request.onsuccess = () => resolve(request.result)
+        request.onerror = (event) => reject(event.target.error)
+
+    })
+
+}
+
+export async function addEvent(event) {
+
+    // Open the db and add the new tracker object
+    const db = await openDatabase()
+    const transaction = db.transaction('events', 'readwrite')
+    const objectStore = transaction.objectStore('events')
+    objectStore.add(event)
+
+    // Return a promise with either a resolution or a rejection and error message
+    return new Promise((resolve, reject) => {
+
+        transaction.oncomplete = () => resolve()
+        transaction.onerror = (event) => reject(event.target.error)
+
+    })
 
 }

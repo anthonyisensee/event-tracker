@@ -1,23 +1,25 @@
 import TrackerCard from "./TrackerCard"
-import { Event } from "../../Models/Event"
+// import { Event } from "../../Models/Event"
 import { Tracker } from "../../Models/Tracker"
 import { Link } from "react-router-dom"
+import { getAllTrackers } from "../../IndexedDB/IndexedDB"
+import { useEffect, useState } from "react"
 
 const Trackers = () => {
 
-    const sampleEvent = new Event({
-        date: new Date("2024-08-26 07:29"),
-        description: "Something bad happened."
-    })
+    const [trackers, setTrackers] = useState()
 
-    const sampleTracker = new Tracker({
-        name: "Example Tracker",
-        events: [sampleEvent]
-    })
+    useEffect(() => {
 
-    const tracker = sampleTracker
+        const getAndSetTrackers = async () => {
 
-    const numCells = 5
+            setTrackers(await getAllTrackers())
+
+        }
+
+        getAndSetTrackers()
+
+    }, [])
 
     return (
         <div>
@@ -26,11 +28,17 @@ const Trackers = () => {
             </div>
             <div className="fixed-grid has-1-cols-mobile has-2-cols-tablet has-3-cols-desktop has-3-cols-widescreen has-5-cols-fullhd">
                 <div className="grid">
-                    {Array.from({ length: numCells }).map((item, index) => (
-                        <div className="cell" key={index}>
-                            <TrackerCard tracker={tracker} />
-                        </div>
-                    ))}
+                    {trackers && trackers.map((item, index) => {
+
+                        const tracker = new Tracker(item)
+
+                        return (
+                            <div className="cell" key={index}>
+                                <TrackerCard tracker={item} />
+                            </div>
+                        )
+
+                    })}
                 </div>
             </div>
             <div className="buttons is-centered">
