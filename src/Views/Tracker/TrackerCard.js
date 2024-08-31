@@ -1,15 +1,13 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
 
-const TrackerCard = (props) => {
+const TrackerCard = ({ tracker }) => {
 
-    const tracker = props.tracker
+    // const [timeSinceArray, setTimeSinceArray] = useState(tracker.timeSinceLastEventArray)
 
-    const [timeSinceArray, setTimeSinceArray] = useState(tracker.timeSinceLastEventArray)
-
-    setTimeout(() => {
-        setTimeSinceArray(tracker.timeSinceLastEventArray)
-    }, 1000)
+    // setTimeout(() => {
+    //     setTimeSinceArray(tracker.timeSinceLastEventArray)
+    // }, 1000)
 
     return (
         <div className="box">
@@ -28,7 +26,7 @@ const TrackerCard = (props) => {
                 <p>has passed since the <Link to="/tracker">last event</Link>.</p>
             </div>
             <div className="buttons is-centered">
-                <Link to="/tracker" className="button">View Details</Link>
+                <Link to="/tracker" className="button" state={{ id: tracker.id }}>View Details</Link>
                 <Link to="/event/create" className="button is-warning">Log New Event</Link>
             </div>
         </div>

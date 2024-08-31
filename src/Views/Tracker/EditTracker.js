@@ -1,15 +1,37 @@
+import { useEffect, useState } from "react"
 import Input from "../../Shared/Bulma/Input"
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
+import { getTracker, putTracker } from "../../IndexedDB/IndexedDB"
 
 const EditTracker = () => {
-
+    
     const navigate = useNavigate()
 
+    const location = useLocation()
+    const { id } = location.state
+
+    // TODO: Redirect if an ID has not been passed in.
+
+    const [tracker, setTracker] = useState(undefined)
+
+    useEffect(() => {
+
+        async function asyncFunction() {
+
+            setTracker(await getTracker(id))
+
+        }
+
+        asyncFunction()
+
+    }, [])
+
     const handleSubmit = (event) => {
-        
+
         event.preventDefault()
 
-        console.log("form submitted")
+        putTracker(tracker)
+        navigate(-1)
 
     }
 
@@ -19,10 +41,10 @@ const EditTracker = () => {
                 <h1>Edit Tracker</h1>
             </div>
             <form onSubmit={handleSubmit}>
-                <Input label="Tracker Name"/>
+                <Input label="Tracker Name" defaultValue={tracker && tracker.name} onChange={(e) => { tracker.name = e.target.value }}/>
                 <div className="buttons is-centered">
-                    <button onClick={() => navigate(-1)}className="button">Cancel</button>
-                    <button className="button is-success">Edit</button>
+                    <button type="button" onClick={() => navigate(-1)} className="button">Cancel</button>
+                    <button type="submit" onClick={handleSubmit} className="button is-success">Edit</button>
                 </div>
             </form>
         </div>

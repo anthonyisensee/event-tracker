@@ -64,6 +64,40 @@ export async function addTracker(tracker) {
 
 }
 
+export async function getTracker(trackerId) {
+
+    const db = await openDatabase()
+    const transaction = db.transaction('trackers', 'readonly')
+    const objectStore = transaction.objectStore('trackers')
+    const request = objectStore.get(trackerId)
+
+    // Return a promise with either a resolution and the data or a rejection and error message
+    return new Promise((resolve, reject) => {
+
+        request.onsuccess = () => resolve(request.result)
+        request.onerror = (event) => reject(event.target.error)
+
+    })
+
+}
+
+export async function putTracker(tracker) {
+
+    const db = await openDatabase()
+    const transaction = db.transaction('trackers', 'readwrite')
+    const objectStore = transaction.objectStore('trackers')
+    const request = objectStore.put(tracker)
+
+    // Return a promise with either a resolution and the data or a rejection and error message
+    return new Promise((resolve, reject) => {
+
+        request.onsuccess = () => resolve(request.result)
+        request.onerror = (event) => reject(event.target.error)
+
+    })
+
+}
+
 export async function removeTracker(trackerId) {
 
     // Open the db and remove the new tracker object

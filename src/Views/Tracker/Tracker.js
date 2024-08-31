@@ -1,52 +1,61 @@
-import { useState } from "react"
-import { Event } from "../../Models/Event"
-import { Tracker as TrackerObject } from "../../Models/Tracker"
-import { Link } from "react-router-dom"
+import { useState, useEffect } from "react"
+import { Link, useLocation, useNavigate } from "react-router-dom"
+import { getTracker, removeTracker } from "../../IndexedDB/IndexedDB"
 
 const Tracker = () => {
 
-    const sampleEvent1 = new Event({
-        date: new Date("2024-03-26 07:29"),
-        description: "Dave tripped into the flamethrower."
-    })
+    const navigate = useNavigate() 
 
-    const sampleEvent2 = new Event({
-        date: new Date("2024-08-26 07:29"),
-        description: "Bob fell into the wood chipper."
-    })
+    const location = useLocation()
 
-    const sampleTracker = new TrackerObject({
-        name: "Example Tracker",
-        events: [sampleEvent1, sampleEvent2]
-    })
+    // TODO: If an ID is not included, redirect to the trackers page.
 
-    const tracker = sampleTracker
+    const { id } = location.state
 
-    const [timeSinceArray, setTimeSinceArray] = useState(tracker.timeSinceLastEventArray)
+    const [tracker, setTracker] = useState(undefined)
+
+    useEffect(() => {
+
+        async function asyncFunction() {
+
+            setTracker(await getTracker(id))
+
+        }
+
+        asyncFunction()
+
+    }, [])
 
     setTimeout(() => {
-        setTimeSinceArray(tracker.timeSinceLastEventArray)
+        // setTimeSinceArray(tracker.timeSinceLastEventArray)
     }, 1000)
+
+    const handleDelete = () => {
+
+        removeTracker(id)
+        navigate('/')
+
+    }
 
     return (
         <div>
             <div className="content has-text-centered">
-                <h1>{tracker.name}</h1>
+                <h1>{tracker && tracker.name}</h1>
             </div>
             <div className="time-since has-text-centered is-flex is-justify-content-center">
-                {timeSinceArray.map((time, index) => (
+                {/* {timeSinceArray.map((time, index) => (
                     <div className="mb-5 ml-5 mr-5" key={index}>
                         <p className="number is-size-1 has-text-weight-bold">{time.number}</p>
                         <p className="unit is-size-5">{time.unit}{time.number === 1 ? "" : "s"}</p>
                     </div>
-                ))}
+                ))} */}
             </div>
             <div className="content has-text-centered is-size-4">
                 <p>has passed since the last event.</p>
             </div>
             <div className="buttons is-centered mt-6">
-                <Link to="/tracker/edit" state={{ tracker }} className="button">Edit Tracker</Link>
-                <button className="button is-danger">Delete Tracker</button>
+                <Link to="/tracker/edit" state={tracker && { id: tracker.id }} className="button">Edit Tracker</Link>
+                <button className="button is-danger" onClick={handleDelete}>Delete Tracker</button>
             </div>
             <br />
             <br />
@@ -62,7 +71,7 @@ const Tracker = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {tracker.events.map((event, index) => {
+                    {/* {tracker.events.map((event, index) => {
                         return (
                             <tr key={index}>
                                 <td>{event.date.toISOString()}</td>
@@ -75,7 +84,7 @@ const Tracker = () => {
                                 </td>
                             </tr>
                         )
-                    })}
+                    })} */}
                 </tbody>
             </table>
             <div className="buttons is-centered mt-6">
