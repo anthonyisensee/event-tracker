@@ -27,7 +27,7 @@ const CreateTracker = () => {
             <form onSubmit={handleSubmit}>
                 <Input label="Tracker Name" onChange={(e) => setTrackerName(e.target.value)}/>
                 <div className="buttons is-centered">
-                    <button onClick={() => navigate(-1)} className="button">Cancel</button>
+                    <button type="button" onClick={() => navigate(-1)} className="button">Cancel</button>
                     <button type="submit" className="button is-success">Create</button>
                 </div>
             </form>
