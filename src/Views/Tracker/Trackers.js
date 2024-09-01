@@ -11,13 +11,13 @@ const Trackers = () => {
 
     useEffect(() => {
 
-        async function asyncFunction() {
-
-            setTrackers(await getAllTrackers())
-
-        }
-
-        asyncFunction()
+        getAllTrackers()
+            .then(trackers => {
+                setTrackers(trackers)
+            })
+            .catch(error => {
+                console.error(error)
+            })
 
     }, [])
 

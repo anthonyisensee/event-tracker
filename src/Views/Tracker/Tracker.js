@@ -1,30 +1,29 @@
 import { useState, useEffect } from "react"
-import { Link, useLocation, useNavigate } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import { getTracker, removeTracker } from "../../IndexedDB/IndexedDB"
 
 const Tracker = () => {
 
+    const [tracker, setTracker] = useState(undefined)
+
     const navigate = useNavigate() 
 
-    const location = useLocation()
+    const { id } = useParams()
 
     // TODO: If an ID is not included, redirect to the trackers page.
 
-    const { id } = location.state
-
-    const [tracker, setTracker] = useState(undefined)
-
+    // Get the tracker by the id parameter passed to the page
     useEffect(() => {
 
-        async function asyncFunction() {
+        getTracker(Number(id))
+            .then((tracker) => {
+                setTracker(tracker)
+            })
+            .catch((error) => {
+                console.error(error)
+            })
 
-            setTracker(await getTracker(id))
-
-        }
-
-        asyncFunction()
-
-    }, [])
+    }, [id])
 
     setTimeout(() => {
         // setTimeSinceArray(tracker.timeSinceLastEventArray)
@@ -32,7 +31,7 @@ const Tracker = () => {
 
     const handleDelete = () => {
 
-        removeTracker(id)
+        removeTracker(Number(id))
         navigate('/')
 
     }
@@ -54,7 +53,7 @@ const Tracker = () => {
                 <p>has passed since the last event.</p>
             </div>
             <div className="buttons is-centered mt-6">
-                <Link to="/tracker/edit" state={tracker && { id: tracker.id }} className="button">Edit Tracker</Link>
+                <Link to={tracker && `/tracker/edit/${tracker.id}`} className="button">Edit Tracker</Link>
                 <button className="button is-danger" onClick={handleDelete}>Delete Tracker</button>
             </div>
             <br />

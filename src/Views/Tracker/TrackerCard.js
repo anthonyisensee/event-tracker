@@ -1,4 +1,4 @@
-import { useState } from "react"
+// import { useState } from "react"
 import { Link } from "react-router-dom"
 
 const TrackerCard = ({ tracker }) => {
@@ -23,10 +23,10 @@ const TrackerCard = ({ tracker }) => {
                 ))} */}
             </div>
             <div className="content has-text-centered is-size-6">
-                <p>has passed since the <Link to="/tracker">last event</Link>.</p>
+                <p>has passed since the last event.</p>
             </div>
             <div className="buttons is-centered">
-                <Link to="/tracker" className="button" state={{ id: tracker.id }}>View Details</Link>
+                <Link to={`/tracker/${tracker.id}`} className="button" state={{ id: tracker.id }}>View Details</Link>
                 <Link to="/event/create" className="button is-warning">Log New Event</Link>
             </div>
         </div>

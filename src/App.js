@@ -15,9 +15,9 @@ function App() {
                 <section className="section">
                     <Routes>
                         <Route path="/" element={<Trackers />} />
-                        <Route path="/tracker" element={<Tracker />} />
+                        <Route path="/tracker/:id" element={<Tracker />} />
                         <Route path="/tracker/create" element={<CreateTracker />} />
-                        <Route path="/tracker/edit" element={<EditTracker />} />
+                        <Route path="/tracker/edit/:id" element={<EditTracker />} />
                         <Route path="/event/create" element={<p>I'm the create event component.</p>} />
                         <Route path="/event/edit" element={<p>I'm the edit event component.</p>} />
                     </Routes>

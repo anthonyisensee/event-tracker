@@ -74,7 +74,7 @@ export async function getTracker(trackerId) {
     // Return a promise with either a resolution and the data or a rejection and error message
     return new Promise((resolve, reject) => {
 
-        request.onsuccess = () => resolve(request.result)
+        request.onsuccess = () => {console.log(request.result); resolve(request.result)}
         request.onerror = (event) => reject(event.target.error)
 
     })
