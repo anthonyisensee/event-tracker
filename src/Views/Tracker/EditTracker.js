@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react"
 import Input from "../../Shared/Bulma/Input"
-import { useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams, Link } from "react-router-dom"
 import { getTracker, putTracker } from "../../IndexedDB/IndexedDB"
 
 const EditTracker = () => {
     
-    const [tracker, setTracker] = useState(undefined)
+    const [tracker, setTracker] = useState()
     
     const { trackerId } = useParams()
     
@@ -30,7 +30,7 @@ const EditTracker = () => {
         event.preventDefault()
 
         putTracker(tracker)
-        navigate(-1)
+        navigate(`/tracker/${trackerId}`)
 
     }
 
@@ -39,13 +39,15 @@ const EditTracker = () => {
             <div className="content has-text-centered">
                 <h1>Edit Tracker</h1>
             </div>
+            { tracker &&
             <form onSubmit={handleSubmit}>
-                <Input label="Tracker Name" defaultValue={tracker && tracker.name} onChange={(e) => { tracker.name = e.target.value }}/>
+                <Input label="Tracker Name" defaultValue={tracker.name} onChange={event => setTracker({ ...tracker, name: event.target.value })}/>
                 <div className="buttons is-centered">
-                    <button type="button" onClick={() => navigate(-1)} className="button">Cancel</button>
+                    <Link to={`/tracker/${trackerId}`} className="button">Cancel</Link>
                     <button type="submit" className="button is-success">Edit</button>
                 </div>
-            </form>
+            </form> 
+            }
         </div>
     )
 

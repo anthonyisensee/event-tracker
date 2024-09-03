@@ -1,7 +1,7 @@
 import { useState } from "react"
 import TextArea from "../../Shared/Bulma/TextArea"
 import Input from "../../Shared/Bulma/Input"
-import { useNavigate, useParams } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import { addEvent } from "../../IndexedDB/IndexedDB"
 
 const CreateEvent = () => {
@@ -26,7 +26,7 @@ const CreateEvent = () => {
         addEvent(eventObject)
             .catch((error) => console.error(error))
 
-        navigate(-1)
+        navigate(`/tracker/${trackerId}`)
 
     }
 
@@ -39,7 +39,7 @@ const CreateEvent = () => {
                 <Input label="Event Date" onChange={(e) => setEventDate(e.target.value)}/>
                 <TextArea label="Event Description" onChange={(e) => setEventDescription(e.target.value)}/>
                 <div className="buttons is-centered">
-                    <button type="button" onClick={() => navigate(-1)} className="button">Cancel</button>
+                    <Link to={`/tracker/${trackerId}`} className="button">Cancel</Link>
                     <button type="submit" className="button is-success">Create</button>
                 </div>
             </form>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import Input from "../../Shared/Bulma/Input"
 import TextArea from "../../Shared/Bulma/TextArea"
-import { useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams, Link } from "react-router-dom"
 import { getEvent, putEvent } from "../../IndexedDB/IndexedDB"
 
 const EditEvent = () => {
@@ -31,7 +31,7 @@ const EditEvent = () => {
         submitEvent.preventDefault()
 
         putEvent(event)
-        navigate(-1)
+        navigate(`/tracker/${event.trackerId}`)
 
     }
 
@@ -40,14 +40,16 @@ const EditEvent = () => {
             <div className="content has-text-centered">
                 <h1>Edit Event</h1>
             </div>
+            { event &&
             <form onSubmit={handleSubmit}>
                 <Input label="Event Date" defaultValue={event && event.date} onChange={ e => event.date = e.target.value }/>
                 <TextArea label="Event Description" defaultValue={event && event.description} onChange={ e => event.description = e.target.value }/>
                 <div className="buttons is-centered">
-                    <button type="button" onClick={() => navigate(-1)} className="button">Cancel</button>
+                    { event && <Link to={`/tracker/${event.trackerId}`} className="button">Cancel</Link> }
                     <button type="submit" className="button is-success">Edit</button>
                 </div>
             </form>
+            }
         </div>
     )
 

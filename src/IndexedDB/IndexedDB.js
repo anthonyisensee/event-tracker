@@ -194,8 +194,6 @@ export async function putEvent(event) {
     const db = await openDatabase()
     const transaction = db.transaction('events', 'readwrite')
     const objectStore = transaction.objectStore('events')
-
-    console.log(event)
     const request = objectStore.put(event)
 
     // Return a promise with either a resolution and the data or a rejection and an error message
