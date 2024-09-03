@@ -13,8 +13,9 @@ const CreateTracker = () => {
 
         event.preventDefault()
 
-        addTracker({name: trackerName})
+        addTracker({ name: trackerName })
 
+        // TODO: Instead of navigating back, navigate to the tracker details.
         navigate(-1)
 
     }

@@ -26,8 +26,8 @@ const TrackerCard = ({ tracker }) => {
                 <p>has passed since the last event.</p>
             </div>
             <div className="buttons is-centered">
-                <Link to={`/tracker/${tracker.id}`} className="button" state={{ id: tracker.id }}>View Details</Link>
-                <Link to="/event/create" className="button is-warning">Log New Event</Link>
+                <Link to={`/tracker/${tracker.id}`} className="button">View Details</Link>
+                <Link to={`/event/create/${tracker.id}`} className="button is-warning">Log New Event</Link>
             </div>
         </div>
     );

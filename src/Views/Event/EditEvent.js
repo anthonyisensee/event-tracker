@@ -1,35 +1,36 @@
 import { useEffect, useState } from "react"
 import Input from "../../Shared/Bulma/Input"
+import TextArea from "../../Shared/Bulma/TextArea"
 import { useNavigate, useParams } from "react-router-dom"
-import { getTracker, putTracker } from "../../IndexedDB/IndexedDB"
+import { getEvent, putEvent } from "../../IndexedDB/IndexedDB"
 
-const EditTracker = () => {
+const EditEvent = () => {
+
+    const [event, setEvent] = useState(undefined)
     
-    const [tracker, setTracker] = useState(undefined)
-    
-    const { trackerId } = useParams()
-    
+    const { eventId } = useParams()
+
     const navigate = useNavigate()
 
     // TODO: Redirect if an ID has not been passed in.
 
     useEffect(() => {
 
-        getTracker(Number(trackerId))
-            .then(tracker => {
-                setTracker(tracker)
+        getEvent(Number(eventId))
+            .then(event => {
+                setEvent(event)
             })
             .catch(error => {
                 console.error(error)
             })
 
-    }, [trackerId])
+    }, [eventId])
 
-    const handleSubmit = (event) => {
+    const handleSubmit = (submitEvent) => {
 
-        event.preventDefault()
+        submitEvent.preventDefault()
 
-        putTracker(tracker)
+        putEvent(event)
         navigate(-1)
 
     }
@@ -37,10 +38,11 @@ const EditTracker = () => {
     return (
         <div>
             <div className="content has-text-centered">
-                <h1>Edit Tracker</h1>
+                <h1>Edit Event</h1>
             </div>
             <form onSubmit={handleSubmit}>
-                <Input label="Tracker Name" defaultValue={tracker && tracker.name} onChange={(e) => { tracker.name = e.target.value }}/>
+                <Input label="Event Date" defaultValue={event && event.date} onChange={ e => event.date = e.target.value }/>
+                <TextArea label="Event Description" defaultValue={event && event.description} onChange={ e => event.description = e.target.value }/>
                 <div className="buttons is-centered">
                     <button type="button" onClick={() => navigate(-1)} className="button">Cancel</button>
                     <button type="submit" className="button is-success">Edit</button>
@@ -51,4 +53,4 @@ const EditTracker = () => {
 
 }
  
-export default EditTracker
+export default EditEvent

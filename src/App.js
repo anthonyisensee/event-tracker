@@ -4,6 +4,8 @@ import Tracker from './Views/Tracker/Tracker'
 import Navbar from './Shared/Navbar'
 import CreateTracker from './Views/Tracker/CreateTracker'
 import EditTracker from './Views/Tracker/EditTracker'
+import CreateEvent from './Views/Event/CreateEvent'
+import EditEvent from './Views/Event/EditEvent'
 
 function App() {
     return (
@@ -14,12 +16,16 @@ function App() {
                 </section>
                 <section className="section">
                     <Routes>
+
                         <Route path="/" element={<Trackers />} />
-                        <Route path="/tracker/:id" element={<Tracker />} />
+                        
+                        <Route path="/tracker/:trackerId" element={<Tracker />} />
                         <Route path="/tracker/create" element={<CreateTracker />} />
-                        <Route path="/tracker/edit/:id" element={<EditTracker />} />
-                        <Route path="/event/create" element={<p>I'm the create event component.</p>} />
-                        <Route path="/event/edit" element={<p>I'm the edit event component.</p>} />
+                        <Route path="/tracker/edit/:trackerId" element={<EditTracker />} />
+                        
+                        <Route path="/event/create/:trackerId" element={<CreateEvent />} />
+                        <Route path="/event/edit/:eventId" element={<EditEvent />} />
+
                     </Routes>
                 </section>
             </div>

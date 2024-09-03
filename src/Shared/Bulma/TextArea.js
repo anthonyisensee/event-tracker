@@ -1,4 +1,4 @@
-const TextArea = ({ label, value, onChange }) => {
+const TextArea = ({ label, defaultValue, onChange }) => {
 
     if (!label) {
         throw new Error("A required label was not provided to a TextArea component.")
@@ -8,7 +8,7 @@ const TextArea = ({ label, value, onChange }) => {
         <div className="field">
             <label className="label">{label}</label>
             <div className="control">
-                <textarea className="textarea" onChange={onChange}>{value}</textarea>
+                <textarea className="textarea" defaultValue={defaultValue} onChange={onChange}></textarea>
             </div>
         </div>
     )

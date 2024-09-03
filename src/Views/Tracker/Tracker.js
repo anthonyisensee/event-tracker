@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
-import { getTracker, removeTracker } from "../../IndexedDB/IndexedDB"
+import { getAllEventsWithTrackerId, getTracker, deleteTracker, deleteEvent } from "../../IndexedDB/IndexedDB"
 
 const Tracker = () => {
 
@@ -8,14 +8,16 @@ const Tracker = () => {
 
     const navigate = useNavigate() 
 
-    const { id } = useParams()
+    const { trackerId } = useParams()
+
+    const [events, setEvents] = useState([])
 
     // TODO: If an ID is not included, redirect to the trackers page.
 
     // Get the tracker by the id parameter passed to the page
     useEffect(() => {
 
-        getTracker(Number(id))
+        getTracker(Number(trackerId))
             .then((tracker) => {
                 setTracker(tracker)
             })
@@ -23,7 +25,15 @@ const Tracker = () => {
                 console.error(error)
             })
 
-    }, [id])
+        getAllEventsWithTrackerId(Number(trackerId))
+            .then((events) => {
+                setEvents(events)
+            })
+            .catch((error) => {
+                console.error(error)
+            })
+
+    }, [trackerId])
 
     setTimeout(() => {
         // setTimeSinceArray(tracker.timeSinceLastEventArray)
@@ -31,8 +41,17 @@ const Tracker = () => {
 
     const handleDelete = () => {
 
-        removeTracker(Number(id))
-        navigate('/')
+        deleteTracker(Number(trackerId))
+            .then(() => navigate('/'))
+        
+
+    }
+
+    const handleEventDelete = (eventId) => {
+
+        deleteEvent(eventId)
+            .then(() => getAllEventsWithTrackerId(Number(trackerId)))
+            .then((events) => setEvents(events))
 
     }
 
@@ -70,24 +89,24 @@ const Tracker = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {/* {tracker.events.map((event, index) => {
+                    {events && events.map((event, index) => {
                         return (
                             <tr key={index}>
-                                <td>{event.date.toISOString()}</td>
+                                <td>{event.date}</td>
                                 <td>{event.description}</td>
                                 <td>
                                     <div className="buttons is-right">
-                                        <Link to="/event/edit" className="button">Edit</Link>
-                                        <button className="button is-danger">Delete</button>
+                                        <Link to={`/event/edit/${event.id}`} className="button">Edit</Link>
+                                        <button onClick={() => handleEventDelete(event.id)} className="button is-danger">Delete</button>
                                     </div>
                                 </td>
                             </tr>
                         )
-                    })} */}
+                    })}
                 </tbody>
             </table>
             <div className="buttons is-centered mt-6">
-                <Link to="/event/create" className="button is-warning">Log New Event</Link>
+                <Link to={`/event/create/${trackerId}`} className="button is-warning">Log New Event</Link>
             </div>
         </div>
     )
