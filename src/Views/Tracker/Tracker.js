@@ -83,6 +83,7 @@ const Tracker = () => {
             <table className="table is-fullwidth">
                 <thead>
                     <tr>
+                        <th>Date</th>
                         <th>Time</th>
                         <th>Description</th>
                         <th></th>
@@ -93,6 +94,7 @@ const Tracker = () => {
                         return (
                             <tr key={index}>
                                 <td>{event.date}</td>
+                                <td>{event.time}</td>
                                 <td>{event.description}</td>
                                 <td>
                                     <div className="buttons is-right">

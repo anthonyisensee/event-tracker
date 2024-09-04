@@ -43,10 +43,28 @@ const EditEvent = () => {
             </div>
             { event &&
             <form onSubmit={handleSubmit}>
-                <Input label="Event Date" defaultValue={event && event.date} onChange={ e => event.date = e.target.value }/>
-                <TextArea label="Event Description" defaultValue={event && event.description} onChange={ e => event.description = e.target.value }/>
+                <Input 
+                    label="Event Date"
+                    type="date"
+                    defaultValue={event.date}
+                    onChange={ e => setEvent({ ...event, date: e.target.value}) }
+                    required={"required"}
+                />
+                <Input 
+                    label="Event Time"
+                    type="time"
+                    step="1"
+                    defaultValue={event.time}
+                    onChange={ e => setEvent({ ...event, time: e.target.value}) }
+                    required={"required"}
+                />
+                <TextArea 
+                    label="Event Description"
+                    defaultValue={event.description}
+                    onChange={ e => setEvent({ ...event, description: e.target.value}) }
+                />
                 <div className="buttons is-centered">
-                    { event && <Link to={`/tracker/${event.trackerId}`} className="button">Cancel</Link> }
+                    <Link to={`/tracker/${event.trackerId}`} className="button">Cancel</Link>
                     <button type="submit" className="button is-success">Edit</button>
                 </div>
             </form>
