@@ -4,10 +4,10 @@ import { useNavigate, Link } from "react-router-dom"
 import { addTracker } from "../../IndexedDB/IndexedDB"
 
 const CreateTracker = () => {
-
-    const [tracker, setTracker] = useState()
-
+    
     const navigate = useNavigate()
+    
+    const [tracker, setTracker] = useState({})
 
     const handleSubmit = (event) => {
 

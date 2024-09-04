@@ -6,24 +6,18 @@ import { addEvent } from "../../IndexedDB/IndexedDB"
 
 const CreateEvent = () => {
 
-    const [eventDate, setEventDate] = useState()
-    const [eventDescription, setEventDescription] = useState()
-
-    const { trackerId } = useParams()
+    const params = useParams()
+    const trackerId = Number(params.trackerId)
 
     const navigate = useNavigate()
 
-    const handleSubmit = (event) => {
+    const [event, setEvent] = useState({ trackerId })
 
-        event.preventDefault()
+    const handleSubmit = (submitEvent) => {
 
-        const eventObject = { 
-            date: eventDate, 
-            description: eventDescription, 
-            trackerId: Number(trackerId) 
-        }
+        submitEvent.preventDefault()
 
-        addEvent(eventObject)
+        addEvent(event)
             .catch((error) => console.error(error))
 
         navigate(`/tracker/${trackerId}`)
@@ -36,8 +30,8 @@ const CreateEvent = () => {
                 <h1>Create New Event</h1>
             </div>
             <form onSubmit={handleSubmit}>
-                <Input label="Event Date" onChange={(e) => setEventDate(e.target.value)}/>
-                <TextArea label="Event Description" onChange={(e) => setEventDescription(e.target.value)}/>
+                <Input label="Event Date" onChange={ (e) => setEvent({ ...event, date: e.target.value }) }/>
+                <TextArea label="Event Description" onChange={ (e) => setEvent({ ...event, description: e.target.value }) }/>
                 <div className="buttons is-centered">
                     <Link to={`/tracker/${trackerId}`} className="button">Cancel</Link>
                     <button type="submit" className="button is-success">Create</button>

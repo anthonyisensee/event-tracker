@@ -6,17 +6,18 @@ import { getEvent, putEvent } from "../../IndexedDB/IndexedDB"
 
 const EditEvent = () => {
 
-    const [event, setEvent] = useState(undefined)
+    const params = useParams()
+    const eventId = Number(params.eventId)
     
-    const { eventId } = useParams()
-
     const navigate = useNavigate()
+    
+    const [event, setEvent] = useState()
 
-    // TODO: Redirect if an ID has not been passed in.
+    // TODO: Redirect or display an error message if no or an invalid id has been passed in.
 
     useEffect(() => {
 
-        getEvent(Number(eventId))
+        getEvent(eventId)
             .then(event => {
                 setEvent(event)
             })

@@ -3,21 +3,21 @@ import { Link, useNavigate, useParams } from "react-router-dom"
 import { getAllEventsWithTrackerId, getTracker, deleteTracker, deleteEvent } from "../../IndexedDB/IndexedDB"
 
 const Tracker = () => {
+    
+    const params = useParams()
+    const trackerId = Number(params.trackerId)
 
-    const [tracker, setTracker] = useState(undefined)
+    const navigate = useNavigate()
 
-    const navigate = useNavigate() 
+    const [tracker, setTracker] = useState()
+    const [events, setEvents] = useState()
 
-    const { trackerId } = useParams()
+    // TODO: For all pages: if an ID is not included redirect to the trackers page.
 
-    const [events, setEvents] = useState([])
-
-    // TODO: If an ID is not included, redirect to the trackers page.
-
-    // Get the tracker by the id parameter passed to the page
+    // Get the tracker and its events by the trackerId parameter passed to the page
     useEffect(() => {
 
-        getTracker(Number(trackerId))
+        getTracker(trackerId)
             .then((tracker) => {
                 setTracker(tracker)
             })
@@ -25,7 +25,7 @@ const Tracker = () => {
                 console.error(error)
             })
 
-        getAllEventsWithTrackerId(Number(trackerId))
+        getAllEventsWithTrackerId(trackerId)
             .then((events) => {
                 setEvents(events)
             })
@@ -41,7 +41,7 @@ const Tracker = () => {
 
     const handleDelete = () => {
 
-        deleteTracker(Number(trackerId))
+        deleteTracker(trackerId)
             .then(() => navigate('/'))
         
 
@@ -50,7 +50,7 @@ const Tracker = () => {
     const handleEventDelete = (eventId) => {
 
         deleteEvent(eventId)
-            .then(() => getAllEventsWithTrackerId(Number(trackerId)))
+            .then(() => getAllEventsWithTrackerId(trackerId))
             .then((events) => setEvents(events))
 
     }

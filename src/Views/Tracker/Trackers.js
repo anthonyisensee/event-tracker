@@ -1,5 +1,4 @@
 import TrackerCard from "./TrackerCard"
-// import { Event } from "../../Models/Event"
 import { Tracker } from "../../Models/Tracker"
 import { Link } from "react-router-dom"
 import { getAllTrackers } from "../../IndexedDB/IndexedDB"

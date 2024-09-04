@@ -24,6 +24,10 @@ function openDatabase() {
                     const eventObjectStore = db.createObjectStore('events', { keyPath: 'id', autoIncrement: true })
                     eventObjectStore.createIndex('trackerId', 'trackerId', { unique: false })
 
+                    break   // There should only ever be one break and it should be after all the numbered cases.
+                
+                default:    // Appease the linter
+                    
             }
 
         }

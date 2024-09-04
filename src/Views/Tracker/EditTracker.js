@@ -5,17 +5,18 @@ import { getTracker, putTracker } from "../../IndexedDB/IndexedDB"
 
 const EditTracker = () => {
     
-    const [tracker, setTracker] = useState()
-    
-    const { trackerId } = useParams()
+    const params = useParams()
+    const trackerId = Number(params.trackerId)
     
     const navigate = useNavigate()
+    
+    const [tracker, setTracker] = useState()
 
-    // TODO: Redirect if an ID has not been passed in.
+    // TODO: Redirect or display an error message if no or an invalid id has been passed in.
 
     useEffect(() => {
 
-        getTracker(Number(trackerId))
+        getTracker(trackerId)
             .then(tracker => {
                 setTracker(tracker)
             })
