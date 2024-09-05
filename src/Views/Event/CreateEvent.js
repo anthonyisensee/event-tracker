@@ -3,6 +3,7 @@ import TextArea from "../../Shared/Bulma/TextArea"
 import Input from "../../Shared/Bulma/Input"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import { addEvent } from "../../IndexedDB/IndexedDB"
+import { currentInputDate, currentInputTime } from "../../DateHelperFunctions"
 
 const CreateEvent = () => {
 
@@ -21,26 +22,6 @@ const CreateEvent = () => {
             .catch((error) => console.error(error))
 
         navigate(`/tracker/${trackerId}`)
-
-    }
-
-    function currentInputDate() {
-
-        const date = new Date()
-        const yyyy = String(date.getFullYear())
-        const mm = String(date.getMonth() + 1).padStart(2, "0")
-        const dd = String(date.getDay()).padStart(2, "0")
-        return `${yyyy}-${mm}-${dd}`
-
-    }
-
-    function currentInputTime() {
-
-        const date = new Date()
-        const hh = String(date.getHours()).padStart(2, "0")
-        const mm = String(date.getMinutes()).padStart(2, "0")
-        const ss = String(date.getSeconds()).padStart(2, "0")
-        return `${hh}:${mm}:${ss}`
 
     }
 

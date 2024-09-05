@@ -1,13 +1,13 @@
 function openDatabase() {
 
     const databaseName = 'event-tracker'
-    const databaseCurrentVersion = 1
+    const databaseCurrentVersion = 2
 
     return new Promise((resolve, reject) => {
 
         const request = window.indexedDB.open(databaseName, databaseCurrentVersion)
 
-        // When database version increase, run this function.
+        // When database version increase this function will be run.
         request.onupgradeneeded = (event) => {
 
             const db = event.target.result
@@ -24,7 +24,22 @@ function openDatabase() {
                     const eventObjectStore = db.createObjectStore('events', { keyPath: 'id', autoIncrement: true })
                     eventObjectStore.createIndex('trackerId', 'trackerId', { unique: false })
 
-                    break   // There should only ever be one break and it should be after all the numbered cases.
+                    // Note that no break is included until the very end of all cases. This is so the upgrade process can perform multiple upgrade steps when needed.
+                
+                    // eslint-disable-next-line
+                case 1:
+
+                    // Create a compound index on events over trackerId, date, and time to make finding a tracker's events at certain times performant
+                    event.target.transaction
+                        .objectStore('events')
+                        .createIndex(
+                            'trackerId_date_time', 
+                            ['trackerId', 'date', 'time'], 
+                            { unique: false }
+                        )
+
+                    
+                    break   // There should only ever be one break and it should be after all cases. 
                 
                 default:    // Appease the linter
                     
@@ -39,7 +54,7 @@ function openDatabase() {
 
         }
 
-        // When opening the database doesn't work reject the promise and return the error
+        // When opening the database doesn't work as expected reject the promise and return the error
         request.onerror = (event) => {
 
             reject(event.target.error)
@@ -193,6 +208,51 @@ export async function getEvent(eventId) {
 
 }
 
+export async function getMostRecentEventWithTrackerId(trackerId) {
+
+    const db = await openDatabase()
+    const transaction = db.transaction('events', 'readonly')
+    const objectStore = transaction.objectStore('events')
+    
+    // Get a reference to the relevant compound index
+    const index = objectStore.index('trackerId_date_time')
+
+    // Specify the range of values we wish to parse
+    const compoundKeyLowerBound = [trackerId]
+    // TODO: Specify an upper bound of the current moment to prevent selecting a future event.
+    const compoundKeyUpperBound = [trackerId, '\uffff', '\uffff']   // \uffff represents the largest unicode character and thus indicates to the cursor that the range it covers should include all possible values for date and time
+    const keyRange = IDBKeyRange.bound(compoundKeyLowerBound, compoundKeyUpperBound)
+
+    // Open a cursor that will iterate over the keyRange in previous order, thus returning the most recent events first
+    const cursorRequest = index.openCursor(keyRange, 'prev')
+
+    return new Promise((resolve, reject) => {
+
+        cursorRequest.onsuccess = (event) => {
+
+            const cursor = event.target.result
+
+            if (cursor) {
+                
+                // If the cursor exists then a value exists in the keyRange. Resolve the promise with only the first value.
+                resolve(cursor.value)
+
+            } else {
+
+                // If the cursor does not exist then no values exist in the keyRange. Resolve the promise with null to indicate the event does not exist.
+                resolve(null)
+
+            }
+
+        }
+
+        // If the cursor request fails make sure to reject the promise with the relevant error.
+        cursorRequest.onerror = (errorEvent) => reject(errorEvent.target.error)
+
+    })
+
+}
+
 export async function putEvent(event) {
 
     const db = await openDatabase()
@@ -227,23 +287,6 @@ export async function deleteEvent(eventId) {
     })
 
 }
-
-// export async function getAllEvents() {
-
-//     const db = await openDatabase()
-//     const transaction = db.transaction('events', 'readonly')
-//     const objectStore = transaction.objectStore('events')
-//     const request = objectStore.getAll()
-
-//     // Return a promise with either a resolution and the data or a rejection and an error message
-//     return new Promise((resolve, reject) => {
-
-//         request.onsuccess = () => resolve(request.result)
-//         request.onerror = (errorEvent) => reject(errorEvent.target.error)
-
-//     })
-
-// }
 
 export async function getAllEventsWithTrackerId(trackerId) {
 

@@ -1,6 +1,6 @@
 import TrackerCard from "./TrackerCard"
 import { Link } from "react-router-dom"
-import { getAllTrackers } from "../../IndexedDB/IndexedDB"
+import { getAllTrackers, getMostRecentEventWithTrackerId } from "../../IndexedDB/IndexedDB"
 import { useEffect, useState } from "react"
 
 const Trackers = () => {
@@ -10,6 +10,29 @@ const Trackers = () => {
     useEffect(() => {
 
         getAllTrackers()
+            .then(trackers => {
+
+                // Create a new array of promises that will resolve to tracker objects with a mostRecentEvent property
+                const promises = trackers.map(tracker => 
+                    
+                    // Get most recent event for each tracker (or null if it does not exist)
+                    getMostRecentEventWithTrackerId(tracker.id)
+                        .then(mostRecentEvent => {
+
+                            // Add the most recent event to the object and return a promise for it
+                            return { ...tracker, mostRecentEvent }
+
+                        })
+
+                )
+
+                // Promise.all() returns a single promise that will resolve only when all sub-promises resolve.
+                const newTrackers = Promise.all(promises)
+
+                // Return the promise for the array of enriched tracker objects.
+                return newTrackers
+
+            })
             .then(trackers => {
                 setTrackers(trackers)
             })

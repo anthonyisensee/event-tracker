@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import { getAllEventsWithTrackerId, getTracker, deleteTracker, deleteEvent } from "../../IndexedDB/IndexedDB"
+import { getMostRecentEventWithTrackerId } from "../../IndexedDB/IndexedDB"
 
 const Tracker = () => {
     
@@ -19,6 +20,20 @@ const Tracker = () => {
 
         getTracker(trackerId)
             .then((tracker) => {
+
+                // Get the most recent event for the tracker (or null if it does not exist)
+                const promise = getMostRecentEventWithTrackerId(tracker.id)
+                    .then(mostRecentEvent => {
+
+                        // Add the most recent event to the object and return a promise for it
+                        return { ...tracker, mostRecentEvent }
+
+                    })
+                
+                return promise
+
+            })
+            .then((tracker) => {
                 setTracker(tracker)
             })
             .catch((error) => {
@@ -35,9 +50,9 @@ const Tracker = () => {
 
     }, [trackerId])
 
-    setTimeout(() => {
-        // setTimeSinceArray(tracker.timeSinceLastEventArray)
-    }, 1000)
+    // setTimeout(() => {
+    //     setTimeSinceArray(tracker.timeSinceLastEventArray)
+    // }, 1000)
 
     const handleDelete = () => {
 
@@ -68,9 +83,9 @@ const Tracker = () => {
                     </div>
                 ))} */}
             </div>
-            <div className="content has-text-centered is-size-4">
+            {/* <div className="content has-text-centered is-size-4">
                 <p>has passed since the last event.</p>
-            </div>
+            </div> */}
             <div className="buttons is-centered mt-6">
                 <Link to={tracker && `/tracker/edit/${tracker.id}`} className="button">Edit Tracker</Link>
                 <button className="button is-danger" onClick={handleDelete}>Delete Tracker</button>
