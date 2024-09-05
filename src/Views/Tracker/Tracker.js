@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import { getAllEventsWithTrackerId, getTracker, deleteTracker, deleteEvent } from "../../IndexedDB/IndexedDB"
 import { getMostRecentEventWithTrackerId } from "../../IndexedDB/IndexedDB"
+import { timeSinceLastEventArray } from "../../DateHelperFunctions"
 
 const Tracker = () => {
     
@@ -12,6 +13,7 @@ const Tracker = () => {
 
     const [tracker, setTracker] = useState()
     const [events, setEvents] = useState()
+    const [timeSinceArray, setTimeSinceArray] = useState()
 
     // TODO: For all pages: if an ID is not included redirect to the trackers page.
 
@@ -35,6 +37,7 @@ const Tracker = () => {
             })
             .then((tracker) => {
                 setTracker(tracker)
+                setTimeSinceArray(timeSinceLastEventArray(tracker.mostRecentEvent.date))
             })
             .catch((error) => {
                 console.error(error)
@@ -50,9 +53,13 @@ const Tracker = () => {
 
     }, [trackerId])
 
-    // setTimeout(() => {
-    //     setTimeSinceArray(tracker.timeSinceLastEventArray)
-    // }, 1000)
+    setTimeout(() => {
+
+        if (tracker) {
+            setTimeSinceArray(timeSinceLastEventArray(tracker.mostRecentEvent.date))
+        }
+
+    }, 1000)
 
     const handleDelete = () => {
 
@@ -75,17 +82,21 @@ const Tracker = () => {
             <div className="content has-text-centered">
                 <h1>{tracker && tracker.name}</h1>
             </div>
-            <div className="time-since has-text-centered is-flex is-justify-content-center">
-                {/* {timeSinceArray.map((time, index) => (
-                    <div className="mb-5 ml-5 mr-5" key={index}>
-                        <p className="number is-size-1 has-text-weight-bold">{time.number}</p>
-                        <p className="unit is-size-5">{time.unit}{time.number === 1 ? "" : "s"}</p>
-                    </div>
-                ))} */}
-            </div>
-            {/* <div className="content has-text-centered is-size-4">
-                <p>has passed since the last event.</p>
-            </div> */}
+            {timeSinceArray && <>
+                <div className="time-since has-text-centered is-flex is-justify-content-center">
+                    {timeSinceArray && timeSinceArray.map((time, index) => (
+                        <div className="mb-5 ml-5 mr-5" key={index}>
+                            <p className="number is-size-1 has-text-weight-bold">{time.number}</p>
+                            <p className="unit is-size-5">{time.unit}</p>
+                        </div>
+                    ))}
+                </div>
+                <div className="content has-text-centered is-size-4">
+                    <p>
+                        {timeSinceArray[timeSinceArray.length - 1].isPlural ? "have" : "has"} passed since {tracker.mostRecentEvent ? "the" : "there is no"} last event.
+                    </p>            
+                </div>
+            </>}
             <div className="buttons is-centered mt-6">
                 <Link to={tracker && `/tracker/edit/${tracker.id}`} className="button">Edit Tracker</Link>
                 <button className="button is-danger" onClick={handleDelete}>Delete Tracker</button>
