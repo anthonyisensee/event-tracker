@@ -2,7 +2,7 @@ export function timeSinceLastEventArray(lastEventDate) {
 
     // If a null date was provided short circuit and return an array indicating infinite time.
     if (lastEventDate === null) {
-        return [{ unit: "Time", number: "∞"}]
+        return [{ unit: "time", number: "Ø", isPlural: false }]
     }
 
     const currentTime = new Date()
@@ -34,7 +34,8 @@ export function timeSinceLastEventArray(lastEventDate) {
 
             arrayOfDifferences.push({
                 unit: `${differenceUnits[index]}${isPlural ? "s" : ""}`,
-                number: differenceValues[index]
+                number: differenceValues[index],
+                isPlural
             })
 
         }

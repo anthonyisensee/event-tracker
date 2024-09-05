@@ -26,14 +26,14 @@ const TrackerCard = ({ tracker }) => {
                 ))}
             </div>
             <div className="content has-text-centered is-size-6">
-                <p>{timeSinceArray.length === 1 ? "has" : "have"} passed since {tracker.mostRecentEvent ? "the last event" : "there are not yet any events."}</p>
+                <p>{timeSinceArray[timeSinceArray.length - 1].isPlural ? "have" : "has"} passed since {tracker.mostRecentEvent ? "the" : "there is no"} last event.</p>
             </div>
             <div className="buttons is-centered">
                 <Link to={`/tracker/${tracker.id}`} className="button">View Details</Link>
                 <Link to={`/event/create/${tracker.id}`} className="button is-warning">Log New Event</Link>
             </div>
         </div>
-    );
+    )
 }
  
 export default TrackerCard
