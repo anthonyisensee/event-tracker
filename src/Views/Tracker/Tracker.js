@@ -105,7 +105,7 @@ const Tracker = () => {
                     </div>
                     <div className="content has-text-centered is-size-4">
                         <p>
-                            {timeSinceArray[timeSinceArray.length - 1].isPlural ? "have" : "has"} passed since {tracker.mostRecentEvent ? "the" : "there is no"} last event.
+                            {timeSinceArray[timeSinceArray.length - 1].isPlural ? "have" : "has"} passed since {latestEvent ? "the" : "there is no"} last event.
                         </p>            
                     </div>
                 </>}
