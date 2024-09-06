@@ -59,7 +59,7 @@ const TrackerCard = ({ tracker }) => {
                     </div>
                     <div className="content has-text-centered is-size-6">
                         <p>
-                            {timeSinceArray[timeSinceArray.length - 1].isPlural ? "have" : "has"} passed since {latestEvent ? "the" : "there is no"} last event.
+                            {timeSinceArray[timeSinceArray.length - 1].isPlural ? "have" : "has"} passed since {latestEvent ? "the" : "there is no"} {latestEvent ? <Link to={`/event/edit/${latestEvent.id}`} state={{ referrer: "/" }}>latest event</Link> : "latest event."}.
                         </p>
                     </div>
                 </>}

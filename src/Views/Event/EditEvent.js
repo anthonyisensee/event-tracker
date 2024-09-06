@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import Input from "../../Shared/Bulma/Input"
 import TextArea from "../../Shared/Bulma/TextArea"
-import { useNavigate, useParams, Link } from "react-router-dom"
+import { useNavigate, useParams, Link, useLocation } from "react-router-dom"
 import { getEvent, putEvent } from "../../IndexedDB/IndexedDB"
 
 const EditEvent = () => {
@@ -10,6 +10,10 @@ const EditEvent = () => {
     const eventId = Number(params.eventId)
     
     const navigate = useNavigate()
+
+    const location = useLocation()
+    const { referrer } = location.state || {}
+    console.log(referrer)
     
     const [event, setEvent] = useState()
 
@@ -30,7 +34,7 @@ const EditEvent = () => {
         submitEvent.preventDefault()
 
         putEvent(event)
-        navigate(`/tracker/${event.trackerId}`)
+        navigate(referrer ? referrer : `/tracker/${event.trackerId}`)
 
     }
 
@@ -62,7 +66,7 @@ const EditEvent = () => {
                     onChange={ e => setEvent({ ...event, description: e.target.value}) }
                 />
                 <div className="buttons is-centered">
-                    <Link to={`/tracker/${event.trackerId}`} className="button">Cancel</Link>
+                    <Link to={referrer ? referrer : `/tracker/${event.trackerId}`} className="button">Cancel</Link>
                     <button type="submit" className="button is-success">Edit</button>
                 </div>
             </form>
