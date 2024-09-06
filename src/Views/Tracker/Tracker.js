@@ -48,7 +48,7 @@ const Tracker = () => {
         getAndSetLatestEvent(trackerId)
         getAndSetEvents(trackerId)
 
-    }, [trackerId])
+    }, [trackerId, getAndSetTracker, getAndSetLatestEvent, getAndSetEvents])
 
     useEffect(() => {
 

@@ -20,7 +20,7 @@ const TrackerCard = ({ tracker }) => {
 
         getAndSetLatestEvent(tracker.id)
 
-    }, [tracker.id])
+    }, [tracker.id, getAndSetLatestEvent])
 
     useEffect(() => {
 
