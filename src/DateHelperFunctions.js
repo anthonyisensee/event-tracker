@@ -1,12 +1,12 @@
-export function timeSinceLastEventArray(lastEventDate) {
+export function timeSinceDateArray(event) {
 
     // If a null date was provided short circuit and return an array indicating infinite time.
-    if (lastEventDate === null) {
+    if (event === null) {
         return [{ unit: "time", number: "Ø", isPlural: false }]
     }
 
     const currentTime = new Date()
-    const latestTime = new Date(lastEventDate)
+    const latestTime = new Date(event)
 
     const milliseconds = (currentTime - latestTime)
     const seconds = Math.floor(milliseconds / 1000)
@@ -64,5 +64,11 @@ export function currentInputTime() {
     const mm = String(date.getMinutes()).padStart(2, "0")
     const ss = String(date.getSeconds()).padStart(2, "0")
     return `${hh}:${mm}:${ss}`
+
+}
+
+export function getEventDate(event) {
+
+    return event && event.date && event.time ? new Date(`${event.date} ${event.time}`) : null
 
 }

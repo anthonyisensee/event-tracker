@@ -20,9 +20,7 @@ const EditTracker = () => {
             .then(tracker => {
                 setTracker(tracker)
             })
-            .catch(error => {
-                console.error(error)
-            })
+            .catch(error => console.error(error))
 
     }, [trackerId])
 

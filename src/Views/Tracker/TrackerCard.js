@@ -1,41 +1,73 @@
-import { useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { Link } from "react-router-dom"
-import { timeSinceLastEventArray } from "../../DateHelperFunctions"
+import { getEventDate, timeSinceDateArray } from "../../DateHelperFunctions"
+import { getLatestEventWithTrackerId } from "../../IndexedDB/IndexedDB"
 
 const TrackerCard = ({ tracker }) => {
 
-    const date = tracker.mostRecentEvent ? new Date(`${tracker.mostRecentEvent.date} ${tracker.mostRecentEvent.time}`) : null
+    const [latestEvent, setLatestEvent] = useState()
+    const [timeSinceArray, setTimeSinceArray] = useState()
 
-    const [timeSinceArray, setTimeSinceArray] = useState(timeSinceLastEventArray(date))
+    const getAndSetLatestEvent = useCallback(async (trackerId) => {
 
-    setTimeout(() => {
-        setTimeSinceArray(timeSinceLastEventArray(date))
-    }, 1000)
+        getLatestEventWithTrackerId(trackerId)
+            .then(event => setLatestEvent(event))
+            .catch(error => console.error(error))
+
+    }, [])
+
+    useEffect(() => {
+
+        getAndSetLatestEvent(tracker.id)
+
+    }, [tracker.id])
+
+    useEffect(() => {
+
+        // Don't do anything until the latestEvent has been set
+        if (latestEvent) {
+
+            // Update timeSinceArray for the first time
+            setTimeSinceArray(timeSinceDateArray(getEventDate(latestEvent)))
+
+            // Set an interval to update the timeSinceArray subsequent times
+            const interval = setInterval(() => {
+                setTimeSinceArray(timeSinceDateArray(getEventDate(latestEvent)))
+            }, 1000)
+
+            // Clean up the interval when the component unmounts
+            return () => clearInterval(interval)
+
+        }
+
+    }, [latestEvent])
 
     return (
         <div className="box">
-            <div className="content has-text-centered">
-                <h3>{tracker.name}</h3>
-            </div>
-            {timeSinceArray && <>
-                <div className="time-since has-text-centered is-flex is-justify-content-center">
-                    {timeSinceArray.map((time, index) => (
-                        <div className="m-2" key={index}>
-                            <p className="number is-size-4">{time.number}</p>
-                            <p className="unit is-size-7">{time.unit}</p>
-                        </div>
-                    ))}
+            {tracker && <>
+                <div className="content has-text-centered">
+                    <h3>{tracker.name}</h3>
                 </div>
-                <div className="content has-text-centered is-size-6">
-                    <p>
-                        {timeSinceArray[timeSinceArray.length - 1].isPlural ? "have" : "has"} passed since {tracker.mostRecentEvent ? "the" : "there is no"} last event.
-                    </p>
+                {timeSinceArray && <>
+                    <div className="time-since has-text-centered is-flex is-justify-content-center">
+                        {timeSinceArray.map((time, index) => (
+                            <div className="m-2" key={index}>
+                                <p className="number is-size-4">{time.number}</p>
+                                <p className="unit is-size-7">{time.unit}</p>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="content has-text-centered is-size-6">
+                        <p>
+                            {timeSinceArray[timeSinceArray.length - 1].isPlural ? "have" : "has"} passed since {tracker.mostRecentEvent ? "the" : "there is no"} last event.
+                        </p>
+                    </div>
+                </>}
+                <div className="buttons is-centered">
+                    <Link to={`/tracker/${tracker.id}`} className="button">View Details</Link>
+                    <Link to={`/event/create/${tracker.id}`} className="button is-warning">Log New Event</Link>
                 </div>
             </>}
-            <div className="buttons is-centered">
-                <Link to={`/tracker/${tracker.id}`} className="button">View Details</Link>
-                <Link to={`/event/create/${tracker.id}`} className="button is-warning">Log New Event</Link>
-            </div>
         </div>
     )
 }

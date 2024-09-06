@@ -19,7 +19,7 @@ const CreateEvent = () => {
         submitEvent.preventDefault()
 
         addEvent(event)
-            .catch((error) => console.error(error))
+            .catch(error => console.error(error))
 
         navigate(`/tracker/${trackerId}`)
 

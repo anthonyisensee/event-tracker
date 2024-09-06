@@ -21,9 +21,7 @@ const EditEvent = () => {
             .then(event => {
                 setEvent(event)
             })
-            .catch(error => {
-                console.error(error)
-            })
+            .catch(error => console.error(error))
 
     }, [eventId])
 

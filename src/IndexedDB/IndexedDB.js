@@ -208,7 +208,7 @@ export async function getEvent(eventId) {
 
 }
 
-export async function getMostRecentEventWithTrackerId(trackerId) {
+export async function getLatestEventWithTrackerId(trackerId) {
 
     const db = await openDatabase()
     const transaction = db.transaction('events', 'readonly')
