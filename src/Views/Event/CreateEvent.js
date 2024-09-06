@@ -16,6 +16,8 @@ const CreateEvent = () => {
     const { referrer } = location.state || {}
 
     const [event, setEvent] = useState({ trackerId, date: currentInputDate(), time: currentInputTime() })
+    const [maxDate, setMaxDate] = useState(currentInputDate())
+    const [maxTime, setMaxTime] = useState(currentInputTime())
 
     const handleSubmit = (submitEvent) => {
 
@@ -26,6 +28,11 @@ const CreateEvent = () => {
 
         navigate(referrer ? referrer : `/tracker/${trackerId}`)
 
+    }
+
+    function handleCreateOnClick() {
+        setMaxDate(currentInputDate())
+        setMaxTime(currentInputTime())
     }
 
     return (
@@ -40,6 +47,7 @@ const CreateEvent = () => {
                     defaultValue={event.date}
                     onChange={ e => setEvent({ ...event, date: e.target.value }) }
                     required={"required"}
+                    max={maxDate}
                 />
                 <Input 
                     label="Event Time"
@@ -48,6 +56,7 @@ const CreateEvent = () => {
                     defaultValue={event.time}
                     onChange={ e => setEvent({ ...event, time: e.target.value }) }
                     required={"required"}
+                    max={maxTime}
                 />
                 <TextArea 
                     label="Event Description"
@@ -55,7 +64,7 @@ const CreateEvent = () => {
                 />
                 <div className="buttons is-centered">
                     <Link to={referrer ? referrer : `/tracker/${trackerId}`} className="button">Cancel</Link>
-                    <button type="submit" className="button is-success">Create</button>
+                    <button onClick={handleCreateOnClick} type="submit" className="button is-success">Create</button>
                 </div>
             </form>
         </div>

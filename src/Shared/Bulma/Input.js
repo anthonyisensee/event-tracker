@@ -1,4 +1,4 @@
-const Input = ({ label, type, defaultValue, onChange, required, step }) => {
+const Input = ({ label, type, defaultValue, onChange, required, step, min, max, minLength, maxLength }) => {
 
     if (!label) {
         throw new Error("A required label was not provided to an Input component.")
@@ -10,11 +10,15 @@ const Input = ({ label, type, defaultValue, onChange, required, step }) => {
             <div className="control">
                 <input
                     className="input"
-                    type={type ? type : "text"}
-                    step={step ? step : ""}
-                    defaultValue={defaultValue}
-                    onChange={onChange}
-                    required={ required ? "required" : "" }
+                    type={type || "text"}
+                    {...(step && { step })}
+                    {...(defaultValue && { defaultValue })}
+                    {...(onChange && { onChange })}
+                    {...(required && { required: true })}
+                    {...(min && { min })}
+                    {...(max && { max })}
+                    {...(minLength && { minLength })}
+                    {...(maxLength && { maxLength })}
                 />
             </div>
         </div>

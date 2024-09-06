@@ -3,6 +3,8 @@ import Input from "../../Shared/Bulma/Input"
 import TextArea from "../../Shared/Bulma/TextArea"
 import { useNavigate, useParams, Link, useLocation } from "react-router-dom"
 import { getEvent, putEvent } from "../../IndexedDB/IndexedDB"
+import { currentInputDate, currentInputTime } from "../../DateHelperFunctions"
+
 
 const EditEvent = () => {
 
@@ -16,6 +18,8 @@ const EditEvent = () => {
     console.log(referrer)
     
     const [event, setEvent] = useState()
+    const [maxDate, setMaxDate] = useState(currentInputDate())
+    const [maxTime, setMaxTime] = useState(currentInputTime())
 
     // TODO: Redirect or display an error message if no or an invalid id has been passed in.
 
@@ -38,6 +42,11 @@ const EditEvent = () => {
 
     }
 
+    function handleCreateOnEdit() {
+        setMaxDate(currentInputDate())
+        setMaxTime(currentInputTime())
+    }
+
     return (
         <div>
             <div className="content has-text-centered">
@@ -51,6 +60,7 @@ const EditEvent = () => {
                     defaultValue={event.date}
                     onChange={ e => setEvent({ ...event, date: e.target.value}) }
                     required={"required"}
+                    max={maxDate}
                 />
                 <Input 
                     label="Event Time"
@@ -59,6 +69,7 @@ const EditEvent = () => {
                     defaultValue={event.time}
                     onChange={ e => setEvent({ ...event, time: e.target.value}) }
                     required={"required"}
+                    max={maxTime}
                 />
                 <TextArea 
                     label="Event Description"
@@ -67,7 +78,7 @@ const EditEvent = () => {
                 />
                 <div className="buttons is-centered">
                     <Link to={referrer ? referrer : `/tracker/${event.trackerId}`} className="button">Cancel</Link>
-                    <button type="submit" className="button is-success">Edit</button>
+                        <button onClick={handleCreateOnEdit} type="submit" className="button is-success">Edit</button>
                 </div>
             </form>
             }
