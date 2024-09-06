@@ -8,7 +8,7 @@ const Navbar = () => {
     return (
         <nav className="navbar" role="navigation" aria-label="main navigation">
             <div className="navbar-brand">
-                <Link to="/" className="navbar-item">Trackers</Link>
+                <Link to="/" className="navbar-item">Dashboard</Link>
                 {/* <button onClick={() => setHamburgerIsOpen(!hamburgerIsOpen)} role="button" className={`navbar-burger ${hamburgerIsOpen ? "is-active" : ""}`} aria-label="menu" aria-expanded={hamburgerIsOpen}>
                     <span aria-hidden="true"></span>
                     <span aria-hidden="true"></span>

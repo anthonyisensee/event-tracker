@@ -1,9 +1,9 @@
-import TrackerCard from "./TrackerCard"
+import TrackerCard from "../Tracker/TrackerCard"
 import { Link } from "react-router-dom"
 import { getAllTrackers } from "../../IndexedDB/IndexedDB"
 import { useEffect, useState } from "react"
 
-const Trackers = () => {
+const Dashboard = () => {
 
     const [trackers, setTrackers] = useState()
 
@@ -18,7 +18,7 @@ const Trackers = () => {
     return (
         <div>
             <div className="content has-text-centered">
-                <h1>Trackers</h1>
+                <h1>Dashboard</h1>
             </div>
             <div className="fixed-grid has-1-cols-mobile has-2-cols-tablet has-3-cols-desktop has-3-cols-widescreen has-5-cols-fullhd">
                 <div className="grid">
@@ -39,4 +39,4 @@ const Trackers = () => {
 
 }
  
-export default Trackers
+export default Dashboard

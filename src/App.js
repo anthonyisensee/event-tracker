@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import Trackers from './Views/Tracker/Trackers'
+import Dashboard from './Views/Dashboard/Dashboard'
 import Tracker from './Views/Tracker/Tracker'
 import Navbar from './Shared/Navbar'
 import CreateTracker from './Views/Tracker/CreateTracker'
@@ -17,7 +17,7 @@ function App() {
                 <section className="section">
                     <Routes>
 
-                        <Route path="/" element={<Trackers />} />
+                        <Route path="/" element={<Dashboard />} />
                         
                         <Route path="/tracker/:trackerId" element={<Tracker />} />
                         <Route path="/tracker/create" element={<CreateTracker />} />
