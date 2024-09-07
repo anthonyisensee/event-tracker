@@ -13,11 +13,13 @@ const CreateEvent = () => {
     const navigate = useNavigate()
 
     const location = useLocation()
-    const { referrer } = location.state || {}
+    const { referrer: customReferrer } = location.state || {}
 
     const [event, setEvent] = useState({ trackerId, date: currentInputDate(), time: currentInputTime() })
     const [maxDate, setMaxDate] = useState(currentInputDate())
     const [maxTime, setMaxTime] = useState(currentInputTime())
+
+    const defaultReferrer = `/tracker/${trackerId}`
 
     const handleSubmit = (submitEvent) => {
 
@@ -26,7 +28,7 @@ const CreateEvent = () => {
         addEvent(event)
             .catch(error => console.error(error))
 
-        navigate(referrer ? referrer : `/tracker/${trackerId}`)
+        navigate(customReferrer ? customReferrer : defaultReferrer)
 
     }
 
@@ -63,7 +65,7 @@ const CreateEvent = () => {
                     onChange={ e => setEvent({ ...event, description: e.target.value }) }
                 />
                 <div className="buttons is-centered">
-                    <Link to={referrer ? referrer : `/tracker/${trackerId}`} className="button">Cancel</Link>
+                    <Link to={customReferrer ? customReferrer : defaultReferrer} className="button">Cancel</Link>
                     <button onClick={handleCreateOnClick} type="submit" className="button is-success">Create</button>
                 </div>
             </form>

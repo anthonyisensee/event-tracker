@@ -14,20 +14,22 @@ const EditEvent = () => {
     const navigate = useNavigate()
 
     const location = useLocation()
-    const { referrer } = location.state || {}
-    console.log(referrer)
+    const { referrer: customReferrer } = location.state || {}
     
     const [event, setEvent] = useState()
     const [maxDate, setMaxDate] = useState(currentInputDate())
     const [maxTime, setMaxTime] = useState(currentInputTime())
+    const [defaultReferrer, setDefaultReferrer] = useState('/')
+    
 
     // TODO: Redirect or display an error message if no or an invalid id has been passed in.
 
     useEffect(() => {
 
         getEvent(eventId)
-            .then(event => {
-                setEvent(event)
+            .then(eventObject => {
+                setEvent(eventObject)
+                setDefaultReferrer(`/tracker/${eventObject.trackerId}`)
             })
             .catch(error => console.error(error))
 
@@ -38,7 +40,7 @@ const EditEvent = () => {
         submitEvent.preventDefault()
 
         putEvent(event)
-        navigate(referrer ? referrer : `/tracker/${event.trackerId}`)
+        navigate(customReferrer ? customReferrer : defaultReferrer)
 
     }
 
@@ -53,34 +55,34 @@ const EditEvent = () => {
                 <h1>Edit Event</h1>
             </div>
             { event &&
-            <form onSubmit={handleSubmit}>
-                <Input 
-                    label="Event Date"
-                    type="date"
-                    defaultValue={event.date}
-                    onChange={ e => setEvent({ ...event, date: e.target.value}) }
-                    required={"required"}
-                    max={maxDate}
-                />
-                <Input 
-                    label="Event Time"
-                    type="time"
-                    step="1"
-                    defaultValue={event.time}
-                    onChange={ e => setEvent({ ...event, time: e.target.value}) }
-                    required={"required"}
-                    max={maxTime}
-                />
-                <TextArea 
-                    label="Event Description"
-                    defaultValue={event.description}
-                    onChange={ e => setEvent({ ...event, description: e.target.value}) }
-                />
-                <div className="buttons is-centered">
-                    <Link to={referrer ? referrer : `/tracker/${event.trackerId}`} className="button">Cancel</Link>
-                        <button onClick={handleCreateOnEdit} type="submit" className="button is-success">Edit</button>
-                </div>
-            </form>
+                <form onSubmit={handleSubmit}>
+                    <Input 
+                        label="Event Date"
+                        type="date"
+                        defaultValue={event.date}
+                        onChange={ e => setEvent({ ...event, date: e.target.value}) }
+                        required={"required"}
+                        max={maxDate}
+                    />
+                    <Input 
+                        label="Event Time"
+                        type="time"
+                        step="1"
+                        defaultValue={event.time}
+                        onChange={ e => setEvent({ ...event, time: e.target.value}) }
+                        required={"required"}
+                        max={maxTime}
+                    />
+                    <TextArea 
+                        label="Event Description"
+                        defaultValue={event.description}
+                        onChange={ e => setEvent({ ...event, description: e.target.value}) }
+                    />
+                    <div className="buttons is-centered">
+                        <Link to={customReferrer ? customReferrer : defaultReferrer} className="button">Cancel</Link>
+                            <button onClick={handleCreateOnEdit} type="submit" className="button is-success">Edit</button>
+                    </div>
+                </form>
             }
         </div>
     )

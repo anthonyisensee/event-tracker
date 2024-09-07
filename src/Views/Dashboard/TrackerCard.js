@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react"
-import { Link } from "react-router-dom"
+import { Link, useLocation } from "react-router-dom"
 import { getEventDate, timeSinceDateArray } from "../../DateHelperFunctions"
 import { getLatestEventWithTrackerId } from "../../IndexedDB/IndexedDB"
 
@@ -7,6 +7,8 @@ const TrackerCard = ({ tracker }) => {
 
     const [latestEvent, setLatestEvent] = useState()
     const [timeSinceArray, setTimeSinceArray] = useState()
+
+    const location = useLocation()
 
     const getAndSetLatestEvent = useCallback(async (trackerId) => {
 
@@ -59,13 +61,13 @@ const TrackerCard = ({ tracker }) => {
                     </div>
                     <div className="content has-text-centered is-size-6">
                         <p>
-                            {timeSinceArray[timeSinceArray.length - 1].isPlural ? "have" : "has"} passed since {latestEvent ? "the" : "there is no"} {latestEvent ? <Link to={`/event/edit/${latestEvent.id}`} state={{ referrer: "/" }}>latest event</Link> : "latest event."}.
+                            {timeSinceArray[timeSinceArray.length - 1].isPlural ? "have" : "has"} passed since {latestEvent ? "the" : "there is no"} {latestEvent ? <Link to={`/event/edit/${latestEvent.id}`} state={{ referrer: location.pathname }}>latest event</Link> : "latest event."}.
                         </p>
                     </div>
                 </>}
                 <div className="buttons is-centered">
                     <Link to={`/tracker/${tracker.id}`} className="button">View Details</Link>
-                    <Link to={`/event/create/${tracker.id}`} state={{ referrer: "/" }} className="button is-warning">Log New Event</Link>
+                    <Link to={`/event/create/${tracker.id}`} state={{ referrer: location.pathname }} className="button is-warning">Create Event</Link>
                 </div>
             </>}
         </div>

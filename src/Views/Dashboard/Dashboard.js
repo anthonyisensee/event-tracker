@@ -1,4 +1,4 @@
-import TrackerCard from "../Tracker/TrackerCard"
+import TrackerCard from "./TrackerCard"
 import { Link } from "react-router-dom"
 import { getAllTrackers } from "../../IndexedDB/IndexedDB"
 import { useEffect, useState } from "react"
