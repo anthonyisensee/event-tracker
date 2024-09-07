@@ -61,13 +61,13 @@ const TrackerCard = ({ tracker }) => {
                     </div>
                     <div className="content has-text-centered is-size-6">
                         <p>
-                            {timeSinceArray[timeSinceArray.length - 1].isPlural ? "have" : "has"} passed since {latestEvent ? "the" : "there is no"} {latestEvent ? <Link to={`/event/edit/${latestEvent.id}`} state={{ referrer: location.pathname }}>latest event</Link> : "latest event."}.
+                            {timeSinceArray[timeSinceArray.length - 1].isPlural ? "have" : "has"} passed since {latestEvent ? "the" : "there is no"} {latestEvent ? <Link to={`/event?id=${latestEvent.id}`} state={{ referrer: location.pathname }}>latest event</Link> : "latest event."}.
                         </p>
                     </div>
                 </>}
                 <div className="buttons is-centered">
                     <Link to={`/tracker/${tracker.id}`} className="button">View Details</Link>
-                    <Link to={`/event/create/${tracker.id}`} state={{ referrer: location.pathname }} className="button is-warning">Create Event</Link>
+                    <Link to={`/event?trackerid=${tracker.id}`} state={{ referrer: location.pathname }} className="button is-warning">Create Event</Link>
                 </div>
             </>}
         </div>

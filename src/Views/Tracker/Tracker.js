@@ -105,7 +105,7 @@ const Tracker = () => {
                     </div>
                     <div className="content has-text-centered is-size-4">
                         <p>
-                            {timeSinceArray[timeSinceArray.length - 1].isPlural ? "have" : "has"} passed since {latestEvent ? "the" : "there is no"} {latestEvent ? <Link to={`/event/edit/${latestEvent.id}`}>latest event</Link> : "latest event."}.
+                            {timeSinceArray[timeSinceArray.length - 1].isPlural ? "have" : "has"} passed since {latestEvent ? "the" : "there is no"} {latestEvent ? <Link to={`/event?id=${latestEvent.id}`}>latest event</Link> : "latest event."}.
                         </p>            
                     </div>
                 </>}
@@ -136,7 +136,7 @@ const Tracker = () => {
                                     <td>{event.description}</td>
                                     <td>
                                         <div className="buttons is-right">
-                                            <Link to={`/event/edit/${event.id}`} className="button">Edit</Link>
+                                            <Link to={`/event?id=${event.id}`} className="button">View</Link>
                                             <button onClick={() => handleEventDelete(event.id)} className="button is-danger">Delete</button>
                                         </div>
                                     </td>
@@ -146,7 +146,7 @@ const Tracker = () => {
                     </tbody>
                 </table>
                 <div className="buttons is-centered mt-6">
-                    <Link to={`/event/create/${trackerId}`} className="button is-warning">Log New Event</Link>
+                    <Link to={`/event?trackerid=${trackerId}`} className="button is-warning">Log New Event</Link>
                 </div>
             </>}
         </div>
