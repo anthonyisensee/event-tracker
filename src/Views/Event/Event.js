@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom"
 import { addEvent, getEvent, putEvent, deleteEvent } from "../../IndexedDB/IndexedDB"
 import { currentInputDate, currentInputTime } from "../../DateHelperFunctions"
@@ -18,9 +18,7 @@ const Event = () => {
     const [event, setEvent] = useState({ date: currentInputDate(), time: currentInputTime() })
     const [defaultReferrer, setDefaultReferrer] = useState()
     const maxDate = currentInputDate()
-    // TODO: Properly implement date limitations
-    // const [maxDate, setMaxDate] = useState(currentInputDate())
-    // const [maxTime, setMaxTime] = useState(currentInputTime())
+    const [maxTime, setMaxTime] = useState(currentInputTime())
 
     // When the page loads make sure that the correct data exist to set a mode. Otherwise, error. 
     useEffect(() => {
@@ -69,11 +67,35 @@ const Event = () => {
 
     }
 
-    // const updateMaxTime = () => {
+    const updateMaxTime = useCallback((selectedDate) => {
 
-    //     setMaxTime(event.date === maxDate ? currentInputTime() : undefined)
+        if (event.date === currentInputDate()) {
+            setMaxTime(currentInputTime())
+        } else {
+            setMaxTime()
+        }
 
-    // }
+    }, [event.date])
+
+    // Update the max time on page load
+    useEffect(() => {
+
+        updateMaxTime(event.date)
+
+    }, [event.date, updateMaxTime])
+
+    // use effect with set timeout that updates max time ever second
+    useEffect(() => {
+
+        const interval = setInterval(() => {
+
+            updateMaxTime(event.date)
+
+        }, 1000)
+
+        return () => clearInterval(interval)
+
+    })
 
     const onClickDeleteButton = () => {
 
@@ -104,7 +126,7 @@ const Event = () => {
                                             defaultValue={event.date}
                                             onChange={e => {
                                                 setEvent({ ...event, date: e.target.value })
-                                                // updateMaxTime()
+                                                updateMaxTime(e.target.value)
                                             }}
                                             max={maxDate}
                                         />}
@@ -122,7 +144,7 @@ const Event = () => {
                                             step="1"
                                             defaultValue={event.time}
                                             onChange={e => setEvent({ ...event, time: e.target.value })}
-                                            // max={maxTime}
+                                            max={maxTime}
                                         />
                                     }
                                 </div>
