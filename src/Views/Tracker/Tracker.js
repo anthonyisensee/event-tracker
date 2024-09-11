@@ -1,27 +1,37 @@
 import { useState, useEffect, useCallback } from "react"
-import { Link, useNavigate, useParams } from "react-router-dom"
-import { getAllEventsWithTrackerId, getTracker, deleteTracker, deleteEvent } from "../../IndexedDB/IndexedDB"
+import { Link, useNavigate, useSearchParams, useLocation } from "react-router-dom"
+import { getAllEventsWithTrackerId, getTracker, deleteTracker, deleteEvent, addTracker, putTracker } from "../../IndexedDB/IndexedDB"
 import { getLatestEventWithTrackerId } from "../../IndexedDB/IndexedDB"
 import { getEventDate, timeSinceDateArray } from "../../DateHelperFunctions"
 
 const Tracker = () => {
     
     // TODO: For all pages: if an ID is not included redirect to the trackers page.
-    const params = useParams()
-    const trackerId = Number(params.trackerId)
+    const [params] = useSearchParams()
+    const trackerId = Number(params.get("id"))
 
     const navigate = useNavigate()
 
+    const location = useLocation()
+    const { referrer } = location.state || {}
+
     const [tracker, setTracker] = useState()
+    const [editedTracker, setEditedTracker] = useState()
     const [latestEvent, setLatestEvent] = useState()
     const [events, setEvents] = useState()
     const [timeSinceArray, setTimeSinceArray] = useState()
+    
+    const [mode, setMode] = useState(!trackerId ? "create" : "view")
+    const [defaultReferrer, setDefaultReferrer] = useState("/")
 
 
     const getAndSetTracker = useCallback(async (trackerId) => {
 
         getTracker(trackerId)
-            .then(tracker => setTracker(tracker))
+            .then(tracker => { 
+                setTracker(tracker)
+                setEditedTracker(tracker)
+            })
             .catch(error => console.error(error))
 
     }, [])
@@ -88,6 +98,29 @@ const Tracker = () => {
 
     }
 
+    const handleSubmit = (submitEvent) => {
+
+        submitEvent.preventDefault()
+
+        if (mode === "create") {
+
+            addTracker(editedTracker ? editedTracker : {})
+                .then(() => navigate(referrer ? referrer : defaultReferrer))
+                .catch(error => console.error(error))
+
+        } else if (mode === "edit") {
+
+            putTracker(editedTracker)
+                .then(() => {
+                    setMode("view")
+                    setTracker(editedTracker)
+                })
+                .catch(error => console.error(error))
+
+        }
+
+    }
+
     return (
         <div>
             {tracker && <>
@@ -109,14 +142,62 @@ const Tracker = () => {
                         </p>            
                     </div>
                 </>}
-                <div className="buttons is-centered mt-6">
-                    <Link to={`/tracker/edit/${tracker.id}`} className="button">Edit Tracker</Link>
-                    <button className="button is-danger" onClick={handleDelete}>Delete Tracker</button>
+            </>}
+            <div className="content mt-6">
+                <h2>{mode !== "view" ? mode.charAt(0).toUpperCase() + mode.slice(1) + " " : ""}Tracker</h2>
+            </div>
+            <form onSubmit={handleSubmit}>
+                <div className="field">
+                    <label className="label">Name</label>
+                    <div className="control">
+                        {mode === "view" && <p>{tracker?.name}</p>}
+                        {mode !== "view" && 
+                            <input 
+                                type="text" 
+                                className="input" 
+                                defaultValue={tracker?.name}
+                                onChange={(e) => setEditedTracker({...editedTracker, name: e.target.value})}
+                            />
+                        }
+                    </div>
                 </div>
-                <br />
-                <br />
+                <div className="field is-grouped">
+                    {mode === "view" && <>
+                        <div className="control">
+                            <button onClick={() => setMode("edit")} type="button" className="button">Edit</button>
+                        </div>
+                        <div className="control">
+                            <button onClick={handleDelete} type="button" className="button is-danger">Delete</button>
+                        </div>
+                    </>}
+                    {mode === "edit" && <>
+                        <div className="control">
+                            <button onClick={() => setMode("view")} className="button" type="button">Cancel</button>
+                        </div>
+                        <div className="control">
+                            <button className="button is-success">Save</button>
+                        </div>
+                    </>}
+                    {mode === "create" && <>
+                        <div className="control">
+                            <button
+                                onClick={() => navigate(referrer ? referrer : defaultReferrer)}
+                                className="button"
+                                type="button"
+                            >Cancel</button>
+                        </div>
+                        <div className="control">
+                            <button className="button is-success">Create</button>
+                        </div>
+                    </>}
+                </div>
+            </form>
+            {tracker && <>
                 <div className="content mt-6">
-                    <h2 className="has-text-centered">Events</h2>
+                    <h2>Events</h2>
+                </div>
+                <div className="buttons">
+                    <Link to={`/event?trackerid=${trackerId}`} className="button is-warning">Log New Event</Link>
                 </div>
                 <table className="table is-fullwidth">
                     <thead>
@@ -145,9 +226,6 @@ const Tracker = () => {
                         })}
                     </tbody>
                 </table>
-                <div className="buttons is-centered mt-6">
-                    <Link to={`/event?trackerid=${trackerId}`} className="button is-warning">Log New Event</Link>
-                </div>
             </>}
         </div>
     )

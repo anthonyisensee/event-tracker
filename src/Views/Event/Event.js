@@ -30,14 +30,14 @@ const Event = () => {
             getEvent(eventId)
                 .then(event => {
                     setEvent(event)
-                    setDefaultReferrer(`/tracker/${event.trackerId}`)
+                    setDefaultReferrer(`/tracker?id=${event.trackerId}`)
                 })
                 .catch(error => console.error(error))
 
         } else if (trackerId && !eventId) {
 
             setMode("create")
-            setDefaultReferrer(`/tracker/${trackerId}`)
+            setDefaultReferrer(`/tracker?id=${trackerId}`)
 
         } else {
 

@@ -32,7 +32,7 @@ const Dashboard = () => {
                 </div>
             </div>
             <div className="buttons is-centered">
-                <Link to="/tracker/create" className="button is-success">Create New Tracker</Link>
+                <Link to="/tracker" className="button is-success">Create New Tracker</Link>
             </div>
         </div>
     )
