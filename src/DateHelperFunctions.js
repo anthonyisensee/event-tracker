@@ -21,21 +21,23 @@ export function timeSinceDateArray(event) {
 
     const arrayOfDifferences = []
 
-    let encounteredNonZero = false
+    let encounteredNonZeroUnit = false
 
     differenceUnits.forEach((unit, index) => {
 
-        // Don't include leading zeroes or their units in the array
-        encounteredNonZero = encounteredNonZero || differenceValues[index] !== 0
-
-        if (encounteredNonZero) {
+        const thisUnitZero = differenceValues[index] !== 0
+        encounteredNonZeroUnit = encounteredNonZeroUnit || thisUnitZero
+        const isLastUnit = differenceValues.length === index + 1
+        
+        // Don't include leading zeroes or their units in the array (except for the last unit)
+        if (encounteredNonZeroUnit || isLastUnit) {
 
             const isPlural = differenceValues[index] !== 1
 
             arrayOfDifferences.push({
                 unit: `${differenceUnits[index]}${isPlural ? "s" : ""}`,
                 number: differenceValues[index],
-                isPlural
+                isPlural: isPlural
             })
 
         }
