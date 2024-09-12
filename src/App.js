@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 import Dashboard from './Views/Dashboard/Dashboard'
 import Tracker from './Views/Tracker/Tracker'
 import Navbar from './Shared/Navbar'
@@ -12,13 +12,13 @@ function App() {
                 <Navbar />
                 <section className="section">
                     <Routes>
-                        <Route path="/" element={<Home />} />
+                        <Route path="/" element={<Home />} title="Test"/>
                         <Route path="/dashboard" element={<Dashboard />} />
                         <Route path="/tracker" element={<Tracker />} />
-                        <Route path="/trackers" element={<p>This will be the trackers page.</p>} />
+                        <Route path="/trackers" element={<p>Trackers page coming soon! For now, create new trackers from the <Link to="/dashboard">dashboard</Link>.</p>} />
                         <Route path="/event" element={<Event />} />
-                        <Route path="/events" element={<p>This will be the events page.</p>} />
-                        <Route path="/settings" element={<p>This will be the settings page.</p>} />
+                        <Route path="/events" element={<p>Events page coming soon! For now, create trackers and events from the <Link to="/dashboard">dashboard</Link>.</p>} />
+                        <Route path="/settings" element={<p>Settings page coming soon to fulfill all your customization wishes!</p>} />
                     </Routes>
                 </section>
             </div>
