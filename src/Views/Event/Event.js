@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react"
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom"
 import { addEvent, getEvent, putEvent, deleteEvent } from "../../IndexedDB/IndexedDB"
 import { currentInputDate, currentInputTime } from "../../DateHelperFunctions"
+import Modal from "../../Shared/Bulma/Modal"
 
 const Event = () => {
 
@@ -19,6 +20,8 @@ const Event = () => {
     const [defaultReferrer, setDefaultReferrer] = useState()
     const maxDate = currentInputDate()
     const [maxTime, setMaxTime] = useState(currentInputTime())
+
+    const [eventDeleteModalIsActive, setEventDeleteModalIsActive] = useState(false)
 
     // When the page loads make sure that the correct data exist to set a mode. Otherwise, error. 
     useEffect(() => {
@@ -97,7 +100,13 @@ const Event = () => {
 
     })
 
-    const onClickDeleteButton = () => {
+    const handleEventDeleteConfirm = () => {
+
+        setEventDeleteModalIsActive(true)
+
+    }
+
+    const handleEventDelete = () => {
 
         deleteEvent(eventId)
             .then(() => navigate(defaultReferrer))
@@ -108,6 +117,20 @@ const Event = () => {
     return (
         <div className="block">
             {event && <>
+                <Modal
+                    isActive={eventDeleteModalIsActive}
+                    setIsActive={setEventDeleteModalIsActive}
+                    onAction={handleEventDelete}
+                    action="delete"
+                    headerTitle="Are you sure you want to delete this event?"
+                    bodyContent={
+                        <div className="content">
+                            <p>This will delete the event that occurred on {event.date} at {event.time}{event.description ? " with the following description:" : "."}</p>
+                            <p>{event.description}</p>
+                            <p className="has-text-weight-bold">Please be certain that this is what you want to do as it cannot be undone!</p>
+                        </div>
+                    } 
+                />
                 <div className="content">
                     <h1>{mode.charAt(0).toUpperCase() + mode.slice(1)} Event</h1>
                 </div>
@@ -172,7 +195,7 @@ const Event = () => {
                                 <button onClick={() => setMode("edit")} type="button" className="button">Edit</button>
                             </div>
                             <div className="control">
-                                <button onClick={onClickDeleteButton} type="button" className="button is-danger">Delete</button>
+                                <button onClick={handleEventDeleteConfirm} type="button" className="button is-danger">Delete</button>
                             </div>
                         </>}
                         {mode === "edit" && <>

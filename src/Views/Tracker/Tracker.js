@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams, useLocation } from "react-router-do
 import { getAllEventsWithTrackerId, getTracker, deleteTracker, deleteEvent, addTracker, putTracker } from "../../IndexedDB/IndexedDB"
 import { getLatestEventWithTrackerId } from "../../IndexedDB/IndexedDB"
 import { getEventDate, timeSinceDateArray } from "../../DateHelperFunctions"
+import Modal from "../../Shared/Bulma/Modal"
 
 const Tracker = () => {
     
@@ -22,7 +23,11 @@ const Tracker = () => {
     const [timeSinceArray, setTimeSinceArray] = useState()
     
     const [mode, setMode] = useState(!trackerId ? "create" : "view")
-    const [defaultReferrer, setDefaultReferrer] = useState("/")
+    const defaultReferrer = "/dashboard"    // TODO: When trackers page is created set this to /trackers
+
+    const [trackerDeleteModalIsActive, setTrackerDeleteModalIsActive] = useState(false)
+    const [eventDeleteModalIsActive, setEventDeleteModalIsActive] = useState(false)
+    const [eventToDelete, setEventToDelete] = useState({})
 
 
     const getAndSetTracker = useCallback(async (trackerId) => {
@@ -39,7 +44,7 @@ const Tracker = () => {
     const getAndSetLatestEvent = useCallback(async (trackerId) => {
 
         getLatestEventWithTrackerId(trackerId)
-            .then(event => setLatestEvent(event))
+            .then(event => setLatestEvent(event ? event : {}))
             .catch(error => console.error(error))
 
     }, [])
@@ -80,20 +85,28 @@ const Tracker = () => {
 
     }, [latestEvent])
 
-    const handleDelete = () => {
+    const handleTrackerDelete = () => {
 
         deleteTracker(trackerId)
-            .then(() => navigate('/'))
+            .then(() => navigate(defaultReferrer))
             .catch(error => console.error(error))
 
     }
 
-    const handleEventDelete = (eventId) => {
+    const handleEventDeleteConfirm = (eventToDelete) => {
 
-        deleteEvent(eventId)
+        setEventToDelete(eventToDelete)
+        setEventDeleteModalIsActive(true)
+
+    }
+
+    const handleEventDelete = () => {
+
+        deleteEvent(eventToDelete.id)
+            .then(() => setEventDeleteModalIsActive(false))
             .then(() => getAllEventsWithTrackerId(trackerId))
             .then((events) => setEvents(events))
-            .then(getAndSetLatestEvent())   // Get and set the latest event in case it was just deleted
+            .then(() => getAndSetLatestEvent(trackerId))   // Get and set the latest event in case it was just deleted
             .catch(error => console.error(error))
 
     }
@@ -123,6 +136,39 @@ const Tracker = () => {
 
     return (
         <div>
+            {/* Tracker delete modal */}
+            {tracker && 
+                <Modal
+                    isActive={trackerDeleteModalIsActive}
+                    setIsActive={setTrackerDeleteModalIsActive}
+                    onAction={() => handleTrackerDelete()}
+                    action="delete"
+                    headerTitle="Are you sure you want to delete this tracker?"
+                    bodyContent={
+                        <div className="content">
+                            <p>This will delete the {tracker.name ? `"${tracker.name}"` : ""} tracker and any of its tracked events.</p>
+                            <p className="has-text-weight-bold">Please be certain that this is what you want to do as it cannot be undone!</p>
+                        </div>
+                    } 
+                />
+            }
+            {/* Event delete modal */}
+            {eventToDelete &&
+                <Modal
+                    isActive={eventDeleteModalIsActive}
+                    setIsActive={setEventDeleteModalIsActive}
+                    onAction={handleEventDelete}
+                    action="delete"
+                    headerTitle="Are you sure you want to delete this event?"
+                    bodyContent={
+                        <div className="content">
+                            <p>This will delete the event that occurred on {eventToDelete.date} at {eventToDelete.time}{eventToDelete.description ? " with the following description:" : "."}</p>
+                            <p>{eventToDelete.description}</p>
+                            <p className="has-text-weight-bold">Please be certain that this is what you want to do as it cannot be undone!</p>
+                        </div>
+                    } 
+                />
+            }
             {tracker && <>
                 <div className="content has-text-centered">
                     <h1>{tracker.name}</h1>
@@ -167,7 +213,7 @@ const Tracker = () => {
                             <button onClick={() => setMode("edit")} type="button" className="button">Edit</button>
                         </div>
                         <div className="control">
-                            <button onClick={handleDelete} type="button" className="button is-danger">Delete</button>
+                            <button onClick={() => setTrackerDeleteModalIsActive(true)} type="button" className="button is-danger">Delete</button>
                         </div>
                     </>}
                     {mode === "edit" && <>
@@ -209,16 +255,16 @@ const Tracker = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {events && events.map((event, index) => {
+                        {events && events.map((eventObject, index) => {
                             return (
                                 <tr key={index}>
-                                    <td>{event.date}</td>
-                                    <td>{event.time}</td>
-                                    <td>{event.description}</td>
+                                    <td>{eventObject.date}</td>
+                                    <td>{eventObject.time}</td>
+                                    <td>{eventObject.description}</td>
                                     <td>
                                         <div className="buttons is-right">
-                                            <Link to={`/event?id=${event.id}`} className="button">View</Link>
-                                            <button onClick={() => handleEventDelete(event.id)} className="button is-danger">Delete</button>
+                                            <Link to={`/event?id=${eventObject.id}`} className="button">View</Link>
+                                            <button onClick={() => handleEventDeleteConfirm(eventObject)} className="button is-danger">Delete</button>
                                         </div>
                                     </td>
                                 </tr>
