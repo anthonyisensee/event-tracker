@@ -122,7 +122,7 @@ const Event = () => {
                     setIsActive={setEventDeleteModalIsActive}
                     onAction={handleEventDelete}
                     action="delete"
-                    headerTitle="Are you sure you want to delete this event?"
+                    headerTitle="Delete event?"
                     bodyContent={
                         <div className="content">
                             <p>This will delete the event that occurred on {event.date} at {event.time}{event.description ? " with the following description:" : "."}</p>

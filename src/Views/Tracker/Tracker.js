@@ -143,7 +143,7 @@ const Tracker = () => {
                     setIsActive={setTrackerDeleteModalIsActive}
                     onAction={() => handleTrackerDelete()}
                     action="delete"
-                    headerTitle="Are you sure you want to delete this tracker?"
+                    headerTitle="Delete tracker?"
                     bodyContent={
                         <div className="content">
                             <p>This will delete the {tracker.name ? `"${tracker.name}"` : ""} tracker and any of its tracked events.</p>
@@ -159,7 +159,7 @@ const Tracker = () => {
                     setIsActive={setEventDeleteModalIsActive}
                     onAction={handleEventDelete}
                     action="delete"
-                    headerTitle="Are you sure you want to delete this event?"
+                    headerTitle="Delete event?"
                     bodyContent={
                         <div className="content">
                             <p>This will delete the event that occurred on {eventToDelete.date} at {eventToDelete.time}{eventToDelete.description ? " with the following description:" : "."}</p>
