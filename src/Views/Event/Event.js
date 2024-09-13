@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react"
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom"
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom"
 import { addEvent, getEvent, putEvent, deleteEvent } from "../../IndexedDB/IndexedDB"
 import { currentInputDate, currentInputTime } from "../../DateHelperFunctions"
 import Modal from "../../Shared/Bulma/Modal"
@@ -132,7 +132,7 @@ const Event = () => {
                     } 
                 />
                 <div className="content">
-                    <h1>{mode.charAt(0).toUpperCase() + mode.slice(1)} Event</h1>
+                    <h1>{mode !== "view" ? `${mode.charAt(0).toUpperCase() + mode.slice(1)} `: ""}Event</h1>
                 </div>
                 <form onSubmit={handleSubmit}>
                     <div className="field is-horizontal">
@@ -193,6 +193,9 @@ const Event = () => {
                         {mode === "view" && <>
                             <div className="control">
                                 <button onClick={() => setMode("edit")} type="button" className="button">Edit</button>
+                            </div>
+                            <div className="control">
+                                <Link to={`/tracker?id=${event.trackerId}`} className="button is-link" type="button">View Tracker</Link>
                             </div>
                             <div className="control">
                                 <button onClick={handleEventDeleteConfirm} type="button" className="button is-danger">Delete</button>
