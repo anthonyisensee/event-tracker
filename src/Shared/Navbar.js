@@ -19,7 +19,7 @@ const Navbar = () => {
             <div onClick={() => setHamburgerIsOpen(false)} className={`navbar-menu ${hamburgerIsOpen ? "is-active" : ""}`}>
                 <div className="navbar-start">
                     <Link to="/dashboard" className="navbar-item">📊 Dashboard</Link>
-                    {/* <Link to="/trackers" className="navbar-item">📅 Trackers</Link> */}
+                    <Link to="/trackers" className="navbar-item">📅 Trackers</Link>
                     {/* <Link to="/events" className="navbar-item">⚠️ Events</Link> */}
                 </div>
                 <div className="navbar-end">

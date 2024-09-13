@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
 import Dashboard from './Views/Dashboard/Dashboard'
 import Tracker from './Views/Tracker/Tracker'
+import Trackers from './Views/Tracker/Trackers'
 import Navbar from './Shared/Navbar'
 import Event from './Views/Event/Event'
 import Home from './Views/Home/Home'
@@ -16,7 +17,7 @@ function App() {
                         <Route path="/" element={<Home />} title="Test"/>
                         <Route path="/dashboard" element={<Dashboard />} />
                         <Route path="/tracker" element={<Tracker />} />
-                        <Route path="/trackers" element={<p>Trackers page coming soon! For now, create new trackers from the <Link to="/dashboard">dashboard</Link>.</p>} />
+                        <Route path="/trackers" element={<Trackers />} />
                         <Route path="/event" element={<Event />} />
                         <Route path="/events" element={<p>Events page coming soon! For now, create trackers and events from the <Link to="/dashboard">dashboard</Link>.</p>} />
                         <Route path="/settings" element={<p>Settings page coming soon to fulfill all your customization wishes!</p>} />
