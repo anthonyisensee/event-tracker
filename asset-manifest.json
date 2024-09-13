@@ -1,0 +1,10 @@
+{
+  "files": {
+    "main.js": "/event-tracker/static/js/main.35d56334.js",
+    "index.html": "/event-tracker/index.html",
+    "main.35d56334.js.map": "/event-tracker/static/js/main.35d56334.js.map"
+  },
+  "entrypoints": [
+    "static/js/main.35d56334.js"
+  ]
+}
