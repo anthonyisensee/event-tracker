@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { getAllTrackers, getLatestEventWithTrackerId } from "../../IndexedDB/IndexedDB"
 import { Link, useLocation } from "react-router-dom"
+import { timeSinceDateArray, getEventDate } from "../../DateHelperFunctions"
 
 const Trackers = () => {
 
@@ -21,7 +22,13 @@ const Trackers = () => {
                         const enrichedTrackers = []
 
                         trackers.forEach((tracker, index) => {
-                            enrichedTrackers.push({ ...tracker, latestEvent: events[index] })
+
+                            enrichedTrackers.push({ 
+                                ...tracker, 
+                                latestEvent: events[index],
+                                timeSinceLastEventDateArray: timeSinceDateArray(getEventDate(events[index]))
+                            })
+
                         })
 
                         setTrackers(enrichedTrackers)
@@ -32,6 +39,36 @@ const Trackers = () => {
             .catch(error => console.error(error))
 
     }, [])
+
+    useEffect(() => {
+
+        // Don't do anything until trackers has been created 
+        if (trackers) {
+
+            // Set an interval to update the timeSinceLastEventArrays for every tracker every second
+            const interval = setInterval(() => {
+
+                // Update the timeSinceLastEventDateArray for every tracker
+                const updatedTrackers = trackers.map(tracker => {
+
+                    return {
+                        ...tracker,
+                        timeSinceLastEventDateArray: timeSinceDateArray(getEventDate(tracker.latestEvent))
+                    }
+
+                })
+
+                setTrackers(updatedTrackers)
+
+            }, 1000)
+
+            // Return a function that will clean up the interval when the component unmounts
+            return () => clearInterval(interval)
+
+        }
+
+    }, [trackers])
+
 
     return (
         <>
@@ -45,8 +82,8 @@ const Trackers = () => {
                 <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Latest Event</th>
-                        <th>Time Since Last Event</th>
+                        <th>Last Event On</th>
+                        <th>Last Event Was</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -58,7 +95,7 @@ const Trackers = () => {
                             </td>
                         </tr>
                     }
-                    {trackers && trackers.length == 0 &&
+                    {trackers && trackers.length === 0 &&
                         <tr>
                             <td colSpan="4">
                                 <p className="is-italic has-text-centered m-4">No trackers have been created. You can create a tracker <Link to="/tracker">here</Link>.</p>
@@ -73,12 +110,19 @@ const Trackers = () => {
                                     {tracker.latestEvent && 
                                         <Link to={`/event?id=${tracker.latestEvent.id}`}>{tracker.latestEvent.date} at {tracker.latestEvent.time}</Link>
                                     }
-                                    {!tracker.latestEvent && <Link to={`/event?trackerid=${tracker.id}`}>Track first event</Link>}
+                                    {!tracker.latestEvent && <p className="is-italic">No events</p>}
                                 </td>
-                                <td></td>
+                                <td>
+                                    {tracker.latestEvent && tracker.timeSinceLastEventDateArray && 
+                                    
+                                        <p>{tracker.timeSinceLastEventDateArray[0].number} {tracker.timeSinceLastEventDateArray[0].unit} ago</p>
+
+                                    }
+                                </td>
                                 <td>
                                     <div className="buttons is-right">
                                         <Link to={`/tracker?id=${tracker.id}`} className="button">View Tracker</Link>
+                                        <Link to={`/event?trackerid=${tracker.id}`} state={{ referrer: location.pathname }} className="button is-warning">New Event</Link>
                                     </div>
                                 </td>
                             </tr>

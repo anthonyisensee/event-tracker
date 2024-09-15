@@ -118,7 +118,17 @@ const Tracker = () => {
         if (mode === "create") {
 
             addTracker(editedTracker ? editedTracker : {})
-                .then(() => navigate(referrer ? referrer : defaultReferrer))
+                .then(() => {
+
+                    // If a referrer exists, navigate to it
+                    if (referrer) {
+                        navigate(referrer)
+                    } else {
+                        setTracker(editedTracker)
+                        setMode("view")
+                    }
+
+                })
                 .catch(error => console.error(error))
 
         } else if (mode === "edit") {

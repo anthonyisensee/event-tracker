@@ -66,8 +66,8 @@ const TrackerCard = ({ tracker }) => {
                     </div>
                 </>}
                 <div className="buttons is-centered">
-                    <Link to={`/tracker?id=${tracker.id}`} className="button">View Details</Link>
-                    <Link to={`/event?trackerid=${tracker.id}`} state={{ referrer: location.pathname }} className="button is-warning">Create Event</Link>
+                    <Link to={`/tracker?id=${tracker.id}`} className="button">View Tracker</Link>
+                    <Link to={`/event?trackerid=${tracker.id}`} state={{ referrer: location.pathname }} className="button is-warning">New Event</Link>
                 </div>
             </>}
         </div>
