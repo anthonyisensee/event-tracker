@@ -1,5 +1,5 @@
 import TrackerCard from "./TrackerCard"
-import { Link, useLocation } from "react-router-dom"
+import { Link } from "react-router-dom"
 import { getAllTrackers } from "../../IndexedDB/IndexedDB"
 import { useEffect, useState } from "react"
 
@@ -14,8 +14,6 @@ const Dashboard = () => {
             .catch(error => console.error(error))
 
     }, [])
-
-    const location = useLocation()
 
     return (
         <div>
