@@ -181,7 +181,7 @@ const Tracker = () => {
             }
             {tracker && <>
                 <div className="content has-text-centered">
-                    <h1>{tracker.name}</h1>
+                    <h1>{tracker.name ?? <span className="is-italic">Unnamed Tracker</span>}</h1>
                 </div>
                 {timeSinceArray && <>
                     <div className="time-since has-text-centered is-flex is-justify-content-center">
@@ -194,7 +194,7 @@ const Tracker = () => {
                     </div>
                     <div className="content has-text-centered is-size-4">
                         <p>
-                            {timeSinceArray[timeSinceArray.length - 1].isPlural ? "have" : "has"} passed since {latestEvent ? "the" : "there is no"} {latestEvent ? <Link to={`/event?id=${latestEvent.id}`}>latest event</Link> : "latest event."}.
+                            {timeSinceArray[timeSinceArray.length - 1].isPlural ? "have" : "has"} passed since {latestEvent ? "the" : "there is no"} {latestEvent ? <Link to={`/event?id=${latestEvent.id}`}>last event</Link> : "last event."}.
                         </p>            
                     </div>
                 </>}
@@ -206,7 +206,7 @@ const Tracker = () => {
                 <div className="field">
                     <label className="label">Name</label>
                     <div className="control">
-                        {mode === "view" && <p>{tracker?.name}</p>}
+                        {mode === "view" && <p>{tracker?.name ?? <span className="is-italic">Unnamed Tracker</span>}</p>}
                         {mode !== "view" && 
                             <input 
                                 type="text" 
