@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Dashboard from './Views/Dashboard/Dashboard'
 import Tracker from './Views/Tracker/Tracker'
 import Trackers from './Views/Tracker/Trackers'
