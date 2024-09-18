@@ -7,6 +7,7 @@ import Event from './Views/Event/Event'
 import Home from './Views/Home/Home'
 import PageNotFound from './Views/PageNotFound'
 import Events from './Views/Event/Events'
+import Settings from './Views/Settings'
 
 function App() {
     return (
@@ -15,13 +16,17 @@ function App() {
                 <Navbar />
                 <section className="section">
                     <Routes>
-                        <Route path="/" element={<Home />} title="Test"/>
+                        <Route path="/" element={<Home />} />
+                        
                         <Route path="/dashboard" element={<Dashboard />} />
-                        <Route path="/tracker" element={<Tracker />} />
+                        
                         <Route path="/trackers" element={<Trackers />} />
-                        <Route path="/event" element={<Event />} />
+                        <Route path="/tracker" element={<Tracker />} />
+                        
                         <Route path="/events" element={<Events />} />
-                        <Route path="/settings" element={<p>Settings page coming soon to fulfill all your customization wishes!</p>} />
+                        <Route path="/event" element={<Event />} />
+                        
+                        <Route path="/settings" element={<Settings />} />
                         
                         <Route path="/*" element={<PageNotFound />} />
                     </Routes>

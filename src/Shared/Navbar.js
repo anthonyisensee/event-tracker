@@ -23,7 +23,7 @@ const Navbar = () => {
                     <Link to="/events" className="navbar-item">🔔 Events</Link>
                 </div>
                 <div className="navbar-end">
-                    {/* <Link to="/settings" className="navbar-item">⚙️ Settings</Link> */}
+                    <Link to="/settings" className="navbar-item">⚙️ Settings</Link>
                 </div>
             </div>
         </nav>
