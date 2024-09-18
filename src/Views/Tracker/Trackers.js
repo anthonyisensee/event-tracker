@@ -82,7 +82,7 @@ const Trackers = () => {
             <table className="table" style={{ width: "100%" }}>
                 <thead>
                     <tr>
-                        <th>Name</th>
+                        <th>Tracker</th>
                         <th>Last Event</th>
                         <th>Last Event Was</th>
                     </tr>

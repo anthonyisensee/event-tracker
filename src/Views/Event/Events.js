@@ -85,6 +85,7 @@ const Events = () => {
             <table className="table" style={{ width: "100%" }}>
                 <thead>
                     <tr>
+                        <th>Event</th>
                         <th>Tracker</th>
                         <th>Date</th>
                         <th>Time</th>
@@ -95,14 +96,14 @@ const Events = () => {
                 <tbody>
                     {!events &&
                         <tr>
-                            <td colSpan="4">
+                            <td colSpan="6">
                                 <p>Loading...</p>
                             </td>
                         </tr>
                     }
                     {events && events.length === 0 &&
                         <tr>
-                            <td colSpan="4">
+                            <td colSpan="6">
                                 <p className="is-italic has-text-centered m-4">No events have been tracked.</p>
                             </td>
                         </tr>
@@ -110,6 +111,7 @@ const Events = () => {
                     {events && events.map((event, index) => {
                         return (
                             <tr key={index}>
+                                <td><Link to={`/event?id=${event.id}`}>Link</Link></td>
                                 <td>
                                     <Link to={`/tracker?id=${event.trackerId}`}>
                                         {event.trackerName ?? <span className="is-italic">Unnamed Tracker</span>}
