@@ -20,7 +20,7 @@ const Navbar = () => {
                 <div className="navbar-start">
                     <Link to="/dashboard" className="navbar-item">📊 Dashboard</Link>
                     <Link to="/trackers" className="navbar-item">📅 Trackers</Link>
-                    {/* <Link to="/events" className="navbar-item">⚠️ Events</Link> */}
+                    <Link to="/events" className="navbar-item">🔔 Events</Link>
                 </div>
                 <div className="navbar-end">
                     {/* <Link to="/settings" className="navbar-item">⚙️ Settings</Link> */}

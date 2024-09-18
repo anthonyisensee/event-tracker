@@ -208,6 +208,23 @@ export async function getEvent(eventId) {
 
 }
 
+export async function getAllEvents() {
+
+    const db = await openDatabase()
+    const transaction = db.transaction('events', 'readonly')
+    const objectStore = transaction.objectStore('events')
+    const request = objectStore.getAll()
+
+    // Return a promise with either a resolution and the data or a rejection and an error message
+    return new Promise((resolve, reject) => {
+
+        request.onsuccess = () => resolve(request.result)
+        request.onerror = (errorEvent) => reject(errorEvent.target.error)
+
+    })
+
+}
+
 export async function getLatestEventWithTrackerId(trackerId) {
 
     const db = await openDatabase()

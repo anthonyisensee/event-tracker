@@ -6,6 +6,7 @@ import Navbar from './Shared/Navbar'
 import Event from './Views/Event/Event'
 import Home from './Views/Home/Home'
 import PageNotFound from './Views/PageNotFound'
+import Events from './Views/Event/Events'
 
 function App() {
     return (
@@ -19,7 +20,7 @@ function App() {
                         <Route path="/tracker" element={<Tracker />} />
                         <Route path="/trackers" element={<Trackers />} />
                         <Route path="/event" element={<Event />} />
-                        <Route path="/events" element={<p>Events page coming soon! For now, create trackers and events from the <Link to="/dashboard">dashboard</Link>.</p>} />
+                        <Route path="/events" element={<Events />} />
                         <Route path="/settings" element={<p>Settings page coming soon to fulfill all your customization wishes!</p>} />
                         
                         <Route path="/*" element={<PageNotFound />} />
