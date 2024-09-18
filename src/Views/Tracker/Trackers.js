@@ -83,22 +83,21 @@ const Trackers = () => {
                 <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Last Event On</th>
+                        <th>Last Event</th>
                         <th>Last Event Was</th>
-                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
                     {!trackers &&
                         <tr>
-                            <td colSpan="4">
+                            <td colSpan="3">
                                 <p>Loading...</p>
                             </td>
                         </tr>
                     }
                     {trackers && trackers.length === 0 &&
                         <tr>
-                            <td colSpan="4">
+                            <td colSpan="3">
                                 <p className="is-italic has-text-centered m-4">No trackers have been created. You can create a tracker <Link to="/tracker">here</Link>.</p>
                             </td>
                         </tr>
@@ -106,7 +105,7 @@ const Trackers = () => {
                     {trackers && trackers.map((tracker, index) => {
                         return (
                             <tr key={index}>
-                                <td>{tracker.name}</td>
+                                <td><Link to={`/tracker?id=${tracker.id}`}>{tracker.name ?? <span className="is-italic">Unnamed Tracker</span>}</Link></td>
                                 <td>
                                     {tracker.latestEvent && 
                                         <Link to={`/event?id=${tracker.latestEvent.id}`}>{tracker.latestEvent.date} at {tracker.latestEvent.time}</Link>
@@ -119,12 +118,6 @@ const Trackers = () => {
                                         <p>{tracker.timeSinceLastEventDateArray[0].number} {tracker.timeSinceLastEventDateArray[0].unit} ago</p>
 
                                     }
-                                </td>
-                                <td>
-                                    <div className="buttons is-right">
-                                        <Link to={`/tracker?id=${tracker.id}`} className="button">View Tracker</Link>
-                                        <Link to={`/event?trackerid=${tracker.id}`} state={{ referrer: location.pathname }} className="button is-warning">New Event</Link>
-                                    </div>
                                 </td>
                             </tr>
                         )
