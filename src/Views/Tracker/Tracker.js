@@ -23,7 +23,7 @@ const Tracker = () => {
     const [timeSinceArray, setTimeSinceArray] = useState()
     
     const [mode, setMode] = useState(!trackerId ? "create" : "view")
-    const defaultReferrer = "/dashboard"    // TODO: When trackers page is created set this to /trackers
+    const defaultReferrer = "/trackers"    // TODO: When trackers page is created set this to /trackers
 
     const [trackerDeleteModalIsActive, setTrackerDeleteModalIsActive] = useState(false)
     const [eventDeleteModalIsActive, setEventDeleteModalIsActive] = useState(false)
@@ -117,16 +117,11 @@ const Tracker = () => {
 
         if (mode === "create") {
 
-            addTracker(editedTracker ? editedTracker : {})
+            addTracker(editedTracker ?? {})
                 .then(() => {
 
                     // If a referrer exists, navigate to it
-                    if (referrer) {
-                        navigate(referrer)
-                    } else {
-                        setTracker(editedTracker)
-                        setMode("view")
-                    }
+                    navigate(referrer ?? defaultReferrer)
 
                 })
                 .catch(error => console.error(error))
