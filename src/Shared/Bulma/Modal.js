@@ -1,6 +1,6 @@
 const Modal = ({ isActive, setIsActive, action, onAction, headerTitle, bodyContent, footerContent }) => {
 
-    const isApprovedMode = ["save", "delete", "remove"].includes(action)
+    const isApprovedMode = ["save", "delete", "remove", "import"].includes(action)
     const isDanger = ["delete", "remove"].includes(action)
 
     return ( 
@@ -13,7 +13,7 @@ const Modal = ({ isActive, setIsActive, action, onAction, headerTitle, bodyConte
                 </header>
                 <section className="modal-card-body">
                     {!bodyContent &&
-                        <div className="content">Are you certain?</div>
+                        <div className="content"><p>Are you certain?</p></div>
                     }
                     {bodyContent && 
                         bodyContent

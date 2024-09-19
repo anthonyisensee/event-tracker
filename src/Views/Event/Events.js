@@ -38,8 +38,6 @@ const Events = () => {
 
                         setEvents(enrichedEvents)
 
-                        console.log(enrichedEvents)
-
                     })
                     .catch(error => console.error(error))
 

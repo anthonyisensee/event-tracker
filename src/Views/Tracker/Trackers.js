@@ -1,13 +1,11 @@
 import { useState, useEffect } from "react"
 import { getAllTrackers, getLatestEventWithTrackerId } from "../../IndexedDB/IndexedDB"
-import { Link, useLocation } from "react-router-dom"
+import { Link } from "react-router-dom"
 import { timeSinceDateArray, getEventDate } from "../../DateHelperFunctions"
 
 const Trackers = () => {
 
     const [trackers, setTrackers] = useState()
-
-    const location = useLocation()
 
     useEffect(() => {
 

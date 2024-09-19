@@ -71,12 +71,12 @@ export async function addTracker(tracker) {
     const db = await openDatabase()
     const transaction = db.transaction('trackers', 'readwrite')
     const objectStore = transaction.objectStore('trackers')
-    objectStore.add(tracker)
+    const request = objectStore.add(tracker)
 
-    // Return a promise with either a resolution or a rejection and error message
+    // Return a promise with either a resolution and the id of the tracker or a rejection and error message
     return new Promise((resolve, reject) => {
 
-        transaction.oncomplete = () => resolve()
+        request.onsuccess = (event) => resolve(event.target.result)
         transaction.onerror = (event) => reject(event.target.error)
 
     })
