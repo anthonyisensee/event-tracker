@@ -48,7 +48,7 @@ const TrackerCard = ({ tracker }) => {
         <div className="box is-flex is-flex-direction-column is-justify-content-space-between" style={{ height: "100%" }}>
             {tracker && <>
                 <div className="content has-text-centered mb-3">
-                    <h2 className="is-size-4 mb-0">{tracker.name ?? (<span class="is-italic">Unnamed Tracker</span>)}</h2>
+                    <h2 className="is-size-4 mb-0">{tracker.name ?? (<span className="is-italic">Unnamed Tracker</span>)}</h2>
                 </div>
                 <div>
                     <div className="time-since has-text-centered is-flex is-justify-content-center">
