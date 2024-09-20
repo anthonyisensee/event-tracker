@@ -12,6 +12,11 @@ const Settings = () => {
     const [importData, setImportData] = useState()
     const [importDataErrorMessage, setImportDataErrorMessage] = useState()
 
+    const [currentColorScheme, setCurrentColorScheme] = useState(
+        localStorage.getItem("settingColorScheme") 
+        ?? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
+    )
+
     const navigate = useNavigate()
 
     // Parse, validate, and store imported data
@@ -83,6 +88,30 @@ const Settings = () => {
 
     }
 
+    const handleColorSchemeChange = () => {
+        
+        const settingColorScheme = localStorage.getItem("settingColorScheme")
+        const systemColorScheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
+        const newColorScheme = (settingColorScheme ?? systemColorScheme) === "dark" ? "light" : "dark"
+        
+        if (newColorScheme === systemColorScheme) {
+            // Remove the user preference if it matches the system color scheme (essentially, reverting to the system color scheme)
+            localStorage.removeItem("settingColorScheme")
+        } else {
+            // Add the user preference to local storage if it doesn't match the system color scheme
+            localStorage.setItem("settingColorScheme", newColorScheme)
+        }
+
+        // Update the React State for color scheme so that the button emoji can be updated correctly
+        setCurrentColorScheme(newColorScheme)
+        
+        // Add the css classes that dicate the color scheme to the html element
+        const html = document.querySelector("html")
+        html.classList.remove(`theme-${newColorScheme === "dark" ? "light" : "dark"}`)
+        html.classList.add(`theme-${newColorScheme}`)
+
+    }
+
     return (
         <div className="content">
             <h1>Settings</h1>
@@ -111,6 +140,13 @@ const Settings = () => {
                         </div>
                     }
                 />
+            </div>
+            <h2>Other</h2>
+            <p>Handy settings to improve your life.</p>
+            <div className="buttons">
+                <button onClick={handleColorSchemeChange} className="button">
+                    {currentColorScheme === "dark" ? "🌙" : "☀️"} Color Scheme
+                </button>
             </div>
         </div>
     )
