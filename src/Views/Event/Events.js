@@ -80,54 +80,56 @@ const Events = () => {
             <div className="content">
                 <h1>Events</h1>
             </div>
-            <table className="table" style={{ width: "100%" }}>
-                <thead>
-                    <tr>
-                        <th>Event</th>
-                        <th>Tracker</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Occurred</th>
-                        <th>Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {!events &&
+            <div className="table-container">
+                <table className="table" style={{ width: "100%" }}>
+                    <thead>
                         <tr>
-                            <td colSpan="6">
-                                <p>Loading...</p>
-                            </td>
+                            <th>Event</th>
+                            <th>Tracker</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Occurred</th>
+                            <th>Description</th>
                         </tr>
-                    }
-                    {events && events.length === 0 &&
-                        <tr>
-                            <td colSpan="6">
-                                <p className="is-italic has-text-centered m-4">No events have been tracked.</p>
-                            </td>
-                        </tr>
-                    }
-                    {events && events.map((event, index) => {
-                        return (
-                            <tr key={index}>
-                                <td><Link to={`/event?id=${event.id}`}>Link</Link></td>
-                                <td>
-                                    <Link to={`/tracker?id=${event.trackerId}`}>
-                                        {event.trackerName ?? <span className="is-italic">Unnamed Tracker</span>}
-                                    </Link>
-                                </td>
-                                <td>{event.date}</td>
-                                <td>{event.time}</td>
-                                <td>
-                                    {event.timeSinceDateArray[0].number} {event.timeSinceDateArray[0].unit} ago
-                                </td>
-                                <td>
-                                    {event.description ?? <span className="is-italic">No description.</span>}
+                    </thead>
+                    <tbody>
+                        {!events &&
+                            <tr>
+                                <td colSpan="6">
+                                    <p>Loading...</p>
                                 </td>
                             </tr>
-                        )
-                    })}
-                </tbody>
-            </table>
+                        }
+                        {events && events.length === 0 &&
+                            <tr>
+                                <td colSpan="6">
+                                    <p className="is-italic has-text-centered m-4">No events have been tracked.</p>
+                                </td>
+                            </tr>
+                        }
+                        {events && events.map((event, index) => {
+                            return (
+                                <tr key={index}>
+                                    <td><Link to={`/event?id=${event.id}`}>Link</Link></td>
+                                    <td>
+                                        <Link to={`/tracker?id=${event.trackerId}`}>
+                                            {event.trackerName ?? <span className="is-italic">Unnamed Tracker</span>}
+                                        </Link>
+                                    </td>
+                                    <td>{event.date}</td>
+                                    <td>{event.time}</td>
+                                    <td>
+                                        {event.timeSinceDateArray[0].number} {event.timeSinceDateArray[0].unit} ago
+                                    </td>
+                                    <td>
+                                        {event.description ?? <span className="is-italic">No description.</span>}
+                                    </td>
+                                </tr>
+                            )
+                        })}
+                    </tbody>
+                </table>
+            </div>
         </>
     )
 }

@@ -250,33 +250,35 @@ const Tracker = () => {
                 <div className="buttons">
                     <Link to={`/event?trackerid=${trackerId}`} className="button is-warning">Log New Event</Link>
                 </div>
-                <table className="table is-fullwidth">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Time</th>
-                            <th>Description</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {events && events.map((eventObject, index) => {
-                            return (
-                                <tr key={index}>
-                                    <td>{eventObject.date}</td>
-                                    <td>{eventObject.time}</td>
-                                    <td>{eventObject.description}</td>
-                                    <td>
-                                        <div className="buttons is-right">
-                                            <Link to={`/event?id=${eventObject.id}`} className="button">View</Link>
-                                            <button onClick={() => handleEventDeleteConfirm(eventObject)} className="button is-danger">Delete</button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            )
-                        })}
-                    </tbody>
-                </table>
+                <div className="table-container">
+                    <table className="table is-fullwidth">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Description</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {events && events.map((eventObject, index) => {
+                                return (
+                                    <tr key={index}>
+                                        <td>{eventObject.date}</td>
+                                        <td>{eventObject.time}</td>
+                                        <td>{eventObject.description}</td>
+                                        <td>
+                                            <div className="buttons is-right">
+                                                <Link to={`/event?id=${eventObject.id}`} className="button">View</Link>
+                                                <button onClick={() => handleEventDeleteConfirm(eventObject)} className="button is-danger">Delete</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )
+                            })}
+                        </tbody>
+                    </table>
+                </div>
             </>}
         </div>
     )
