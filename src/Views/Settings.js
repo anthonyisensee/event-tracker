@@ -1,6 +1,6 @@
 import { useState } from "react"
 import Modal from "../Shared/Bulma/Modal"
-import { addEvent, addTracker } from "../IndexedDB/IndexedDB"
+import { addEvent, addTracker, deleteDatabase } from "../IndexedDB/IndexedDB"
 import { useNavigate, useSearchParams } from "react-router-dom"
 
 const Settings = () => {
@@ -12,8 +12,11 @@ const Settings = () => {
     const [importData, setImportData] = useState()
     const [importDataErrorMessage, setImportDataErrorMessage] = useState()
 
+    const [deleteAllDataModalActive, setDeleteAllDataModalActive] = useState()
+    const [deleteAllDataFinalModalActive, setDeleteAllDataFinalModalActive] = useState()
+
     const [currentColorScheme, setCurrentColorScheme] = useState(
-        localStorage.getItem("settingColorScheme") 
+        localStorage.getItem("settingColorScheme")
         ?? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
     )
 
@@ -34,10 +37,10 @@ const Settings = () => {
         }
 
         if (!errored) {
-            
+
             // Make sure the trackers exist
             const trackersExist = data.trackers?.length > 0
-            
+
             if (!trackersExist) {
                 errored = true
                 setImportDataErrorMessage("The data you provided does not contain any trackers.")
@@ -89,11 +92,11 @@ const Settings = () => {
     }
 
     const handleColorSchemeChange = () => {
-        
+
         const settingColorScheme = localStorage.getItem("settingColorScheme")
         const systemColorScheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
         const newColorScheme = (settingColorScheme ?? systemColorScheme) === "dark" ? "light" : "dark"
-        
+
         if (newColorScheme === systemColorScheme) {
             // Remove the user preference if it matches the system color scheme (essentially, reverting to the system color scheme)
             localStorage.removeItem("settingColorScheme")
@@ -104,11 +107,31 @@ const Settings = () => {
 
         // Update the React State for color scheme so that the button emoji can be updated correctly
         setCurrentColorScheme(newColorScheme)
-        
+
         // Add the css classes that dicate the color scheme to the html element
         const html = document.querySelector("html")
         html.classList.remove(`theme-${newColorScheme === "dark" ? "light" : "dark"}`)
         html.classList.add(`theme-${newColorScheme}`)
+
+    }
+
+    const handleDeleteAllData = (finalConfirmation = false) => {
+
+        if (!finalConfirmation) {
+
+            setDeleteAllDataModalActive(false)
+            setDeleteAllDataFinalModalActive(true)
+
+        } else {
+
+            deleteDatabase()
+                .then(() => {
+                    setDeleteAllDataFinalModalActive(false)
+                    navigate("/")
+                })
+                .catch(error => console.error(error))
+
+        }
 
     }
 
@@ -130,13 +153,37 @@ const Settings = () => {
                             <div className="field">
                                 <div className="control">
                                     <label className="label">Data to Import</label>
-                                    <textarea 
+                                    <textarea
                                         className="textarea"
                                         onChange={e => setImportData(e.target.value)}
                                     ></textarea>
                                     <p className="help is-danger">{importDataErrorMessage}</p>
                                 </div>
                             </div>
+                        </div>
+                    }
+                />
+                <div onClick={() => setDeleteAllDataModalActive(true)} className="button is-danger">Delete All Data</div>
+                <Modal
+                    isActive={deleteAllDataModalActive}
+                    setIsActive={setDeleteAllDataModalActive}
+                    onAction={() => handleDeleteAllData(false)}
+                    action="delete"
+                    headerTitle="Delete All Data"
+                    bodyContent={
+                        <p>Are you sure you want to delete all application data?</p>
+                    }
+                />
+                <Modal
+                    isActive={deleteAllDataFinalModalActive}
+                    setIsActive={setDeleteAllDataFinalModalActive}
+                    onAction={() => handleDeleteAllData(true)}
+                    action="delete"
+                    headerTitle="Delete All Data"
+                    bodyContent={
+                        <div>
+                            <p><strong>WARNING: this action cannot be undone.</strong></p>
+                            <p>Are you absolutely certain that you want to delete all application data?</p>
                         </div>
                     }
                 />

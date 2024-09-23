@@ -1,7 +1,8 @@
+const databaseName = 'event-tracker'
+const databaseCurrentVersion = 2
+
 function openDatabase() {
 
-    const databaseName = 'event-tracker'
-    const databaseCurrentVersion = 2
 
     return new Promise((resolve, reject) => {
 
@@ -60,6 +61,19 @@ function openDatabase() {
             reject(event.target.error)
 
         }
+
+    })
+
+}
+
+export async function deleteDatabase() {
+
+    const request = window.indexedDB.deleteDatabase(databaseName)
+
+    return new Promise((resolve, reject) => {
+
+        request.onsuccess = () => resolve()
+        request.onerror = (event) => reject(event.target.error)
 
     })
 
