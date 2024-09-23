@@ -83,9 +83,9 @@ const Settings = () => {
                         setExportData(JSON.stringify(data))
                         
                     })
+                    .catch(error => console.error(error))
 
             })
-
             .catch(error => console.error(error))
 
     }
