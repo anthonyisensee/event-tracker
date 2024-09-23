@@ -1,6 +1,6 @@
 import { useState } from "react"
 import Modal from "../Shared/Bulma/Modal"
-import { addEvent, addTracker, deleteDatabase } from "../IndexedDB/IndexedDB"
+import { addEvent, addTracker, deleteDatabase, getAllEventsWithTrackerId, getAllTrackers } from "../IndexedDB/IndexedDB"
 import { useNavigate, useSearchParams } from "react-router-dom"
 
 const Settings = () => {
@@ -8,19 +8,106 @@ const Settings = () => {
     const [params] = useSearchParams()
     const setting = params.get("setting")
 
+    // Import data setting
     const [importDataModalActive, setImportDataModalActive] = useState(setting === "importdata")
     const [importData, setImportData] = useState()
     const [importDataErrorMessage, setImportDataErrorMessage] = useState()
-
+    
+    // Export data setting
+    const [exportDataModalActive, setExportDataModalActive] = useState(setting === "exportdata")
+    const [exportData, setExportData] = useState()
+    const [exportDataSuccessMessage, setExportDataSuccessMessage] = useState()
+    
+    // Delete all data setting
     const [deleteAllDataModalActive, setDeleteAllDataModalActive] = useState()
     const [deleteAllDataFinalModalActive, setDeleteAllDataFinalModalActive] = useState()
 
+    // Color scheme setting
     const [currentColorScheme, setCurrentColorScheme] = useState(
         localStorage.getItem("settingColorScheme")
         ?? (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
     )
 
     const navigate = useNavigate()
+
+    const handleExportDataModalActive = (isActive) => {
+        
+        if (!isActive) {
+            setExportDataSuccessMessage(undefined)
+            setExportData(undefined)
+        }
+
+        setExportDataModalActive(isActive)
+
+    }
+
+    const handleOpenExportDataModal = () => {
+
+        handleExportDataModalActive(true)
+
+        let data = {
+            trackers: []
+        }
+        
+        getAllTrackers()
+            .then(trackers => {
+
+                const eventPromises = trackers.map(tracker => getAllEventsWithTrackerId(tracker.id))
+
+                Promise.all(eventPromises)
+                    .then(eventsByTracker => {
+
+                        eventsByTracker.forEach((event, index) => {
+
+                            // Assemble the tracker object
+                            let trackerObject = {
+                                ...trackers[index],
+                                events: eventsByTracker[index]
+                            }
+
+                            // Remove ids
+                            delete trackerObject.id
+                            trackerObject.events.forEach(event => {
+                                delete event.id
+                                delete event.trackerId
+                            })
+
+                            // Add the data to the array
+                            data.trackers.push(trackerObject)
+
+                        })
+        
+                    })
+                    .then(() => {
+
+                        setExportData(JSON.stringify(data))
+                        
+                    })
+
+            })
+
+            .catch(error => console.error(error))
+
+    }
+
+    const handleCopyExportedData = () => {
+
+        async function copyToClipboard(text) {
+
+            const type = "text/plain"
+            const blob = new Blob([text], { type })
+            const data = [new ClipboardItem({ [type]: blob })]
+
+            await navigator.clipboard.write(data)
+            
+        }
+
+        copyToClipboard(exportData)
+            .then(() => {
+                setExportDataSuccessMessage("Data copied to clipboard.")
+            })
+
+    }
 
     // Parse, validate, and store imported data
     const handleImportData = () => {
@@ -91,6 +178,26 @@ const Settings = () => {
 
     }
 
+    const handleDeleteAllData = (finalConfirmation = false) => {
+
+        if (!finalConfirmation) {
+
+            setDeleteAllDataModalActive(false)
+            setDeleteAllDataFinalModalActive(true)
+
+        } else {
+
+            deleteDatabase()
+                .then(() => {
+                    setDeleteAllDataFinalModalActive(false)
+                    navigate("/")
+                })
+                .catch(error => console.error(error))
+
+        }
+
+    }
+
     const handleColorSchemeChange = () => {
 
         const settingColorScheme = localStorage.getItem("settingColorScheme")
@@ -115,32 +222,47 @@ const Settings = () => {
 
     }
 
-    const handleDeleteAllData = (finalConfirmation = false) => {
-
-        if (!finalConfirmation) {
-
-            setDeleteAllDataModalActive(false)
-            setDeleteAllDataFinalModalActive(true)
-
-        } else {
-
-            deleteDatabase()
-                .then(() => {
-                    setDeleteAllDataFinalModalActive(false)
-                    navigate("/")
-                })
-                .catch(error => console.error(error))
-
-        }
-
-    }
-
     return (
         <div className="content">
             <h1>Settings</h1>
             <h2>Data</h2>
             <p>Manage your data here.</p>
             <div className="buttons">
+                <button onClick={handleOpenExportDataModal} className="button">Export Data</button>
+                <Modal
+                    isActive={exportDataModalActive}
+                    setIsActive={handleExportDataModalActive}
+                    headerTitle="Export Data"
+                    hasFooter={false}
+                    bodyContent={
+                        <div className="content">
+                            <div className="field">
+                                <div className="control">
+                                    <label className="label">Exported Data</label>
+                                    <textarea
+                                        className="textarea"
+                                        onChange={e => setExportData(e.target.value)}
+                                        readOnly
+                                        value={exportData}
+                                        placeholder="Exporting data..."
+                                    ></textarea>
+                                    {exportDataSuccessMessage && 
+                                        <p className="help">{exportDataSuccessMessage}</p>
+                                    }
+                                </div>
+                            </div>
+                            <div className="field">
+                                <div className="control">
+                                    <button
+                                        onClick={handleCopyExportedData}
+                                        className="button"
+                                        disabled={exportData ?? false ? false : true}
+                                    >Copy</button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                />
                 <button onClick={() => setImportDataModalActive(true)} className="button">Import Data</button>
                 <Modal
                     isActive={importDataModalActive}

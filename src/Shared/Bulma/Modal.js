@@ -1,4 +1,4 @@
-const Modal = ({ isActive, setIsActive, action, onAction, headerTitle, bodyContent, footerContent }) => {
+const Modal = ({ isActive, setIsActive, action, onAction, headerTitle, bodyContent, hasFooter = true, footerContent }) => {
 
     const isApprovedMode = ["save", "delete", "remove", "import"].includes(action)
     const isDanger = ["delete", "remove"].includes(action)
@@ -19,22 +19,24 @@ const Modal = ({ isActive, setIsActive, action, onAction, headerTitle, bodyConte
                         bodyContent
                     }
                 </section>
-                <footer className="modal-card-foot">
-                    {!footerContent &&
-                        <div className="buttons is-right">
-                            {!isApprovedMode &&
-                                <button onClick={() => onAction()} type="button" className="button is-info">Confirm</button>
-                            }
-                            {isApprovedMode &&
-                                <button onClick={() => onAction()} type="button" className={`button ${isDanger ? "is-danger" : "is-success"}`}>{action.charAt(0).toUpperCase() + action.slice(1)}</button>
-                            }
-                            <button onClick={() => setIsActive(false)} type="button" className="button">Cancel</button>
-                        </div>
-                    }
-                    {footerContent && 
-                        footerContent
-                    }
-                </footer>
+                {hasFooter &&
+                    <footer className="modal-card-foot">
+                        {!footerContent &&
+                            <div className="buttons is-right">
+                                {!isApprovedMode &&
+                                    <button onClick={() => onAction()} type="button" className="button is-info">Confirm</button>
+                                }
+                                {isApprovedMode &&
+                                    <button onClick={() => onAction()} type="button" className={`button ${isDanger ? "is-danger" : "is-success"}`}>{action.charAt(0).toUpperCase() + action.slice(1)}</button>
+                                }
+                                <button onClick={() => setIsActive(false)} type="button" className="button">Cancel</button>
+                            </div>
+                        }
+                        {footerContent && 
+                            footerContent
+                        }
+                    </footer>
+                }
             </div>
         </div>
     )
