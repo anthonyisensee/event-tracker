@@ -29,7 +29,6 @@ const Tracker = () => {
     const [eventDeleteModalIsActive, setEventDeleteModalIsActive] = useState(false)
     const [eventToDelete, setEventToDelete] = useState({})
 
-
     const getAndSetTracker = useCallback(async (trackerId) => {
 
         getTracker(trackerId)
@@ -211,6 +210,27 @@ const Tracker = () => {
                             />
                         }
                     </div>
+                </div>
+                <div className="field">
+                    <label className="label">Targets</label>
+                    <div className="control">
+                        {mode === "view" && <p>{tracker?.targets}</p>}
+                        {mode !== "view" &&
+                            <div className="select">
+                                <select 
+                                    name="Targets"
+                                    onChange={(e) => setEditedTracker({...editedTracker, targets: e.target.value})}
+                                    defaultValue={tracker?.targets ?? "Past events"}
+                                >
+                                    <option value="Past events">Past events</option>
+                                    <option value="Future events">Future events</option>
+                                </select>
+                            </div>
+                        }
+                    </div>
+                    {mode !== "view" &&
+                        <div className="help"><p>Change whether the tracker tracks time since the last event or until the next event.</p></div>
+                    }
                 </div>
                 <div className="field is-grouped">
                     {mode === "view" && <>
