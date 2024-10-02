@@ -1,5 +1,5 @@
 const databaseName = 'event-tracker'
-const databaseCurrentVersion = 2
+const databaseCurrentVersion = 3
 
 function openDatabase() {
 
@@ -27,7 +27,7 @@ function openDatabase() {
 
                     // Note that no break is included until the very end of all cases. This is so the upgrade process can perform multiple upgrade steps when needed.
                 
-                    // eslint-disable-next-line
+                // eslint-disable-next-line
                 case 1:
 
                     // Create a compound index on events over trackerId, date, and time to make finding a tracker's events at certain times performant
@@ -39,12 +39,40 @@ function openDatabase() {
                             { unique: false }
                         )
 
+                // eslint-disable-next-line
+                case 2:
+
+                    // This version of the database introduces the need for a "targets" property on all tracker objects. 
+                    
+                    // For clients that have created trackers in a prior version of the database we must add the default value for this property to all tracker objects.
+
+                    getAllTrackers()
+                        .then(trackers => {
+        
+                            trackers.forEach(tracker => {
+
+                                if (!tracker.targets) {
+                                    
+                                    putTracker({
+                                        ...tracker,
+                                        targets: "Past events"
+                                    })
+                                        .catch(error => console.error(error))
+
+                                }
+        
+                            })
+        
+                        })
+                        .catch(error => console.error(error))
                     
                     break   // There should only ever be one break and it should be after all cases. 
                 
                 default:    // Appease the linter
                     
             }
+
+
 
         }
 
