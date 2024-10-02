@@ -1,3 +1,5 @@
+import { currentInputDate, currentInputTime } from "../DateHelperFunctions"
+
 const databaseName = 'event-tracker'
 const databaseCurrentVersion = 3
 
@@ -267,7 +269,7 @@ export async function getAllEvents() {
 
 }
 
-export async function getLatestEventWithTrackerId(trackerId) {
+export async function getLastEventWithTrackerId(trackerId) {
 
     const db = await openDatabase()
     const transaction = db.transaction('events', 'readonly')
@@ -278,12 +280,55 @@ export async function getLatestEventWithTrackerId(trackerId) {
 
     // Specify the range of values we wish to parse
     const compoundKeyLowerBound = [trackerId]
-    // TODO: Specify an upper bound of the current moment to prevent selecting a future event.
-    const compoundKeyUpperBound = [trackerId, '\uffff', '\uffff']   // \uffff represents the largest unicode character and thus indicates to the cursor that the range it covers should include all possible values for date and time
+    const compoundKeyUpperBound = [trackerId, currentInputDate(), currentInputTime()]
     const keyRange = IDBKeyRange.bound(compoundKeyLowerBound, compoundKeyUpperBound)
 
     // Open a cursor that will iterate over the keyRange in previous order, thus returning the most recent events first
     const cursorRequest = index.openCursor(keyRange, 'prev')
+
+    return new Promise((resolve, reject) => {
+
+        cursorRequest.onsuccess = (event) => {
+
+            const cursor = event.target.result
+
+            if (cursor) {
+                
+                // If the cursor exists then a value exists in the keyRange. Resolve the promise with only the first value.
+                resolve(cursor.value)
+
+            } else {
+
+                // If the cursor does not exist then no values exist in the keyRange. Resolve the promise with null to indicate the event does not exist.
+                resolve(null)
+
+            }
+
+        }
+
+        // If the cursor request fails make sure to reject the promise with the relevant error.
+        cursorRequest.onerror = (errorEvent) => reject(errorEvent.target.error)
+
+    })
+
+}
+
+export async function getNextEventWithTrackerId(trackerId) {
+
+    const db = await openDatabase()
+    const transaction = db.transaction('events', 'readonly')
+    const objectStore = transaction.objectStore('events')
+    
+    // Get a reference to the relevant compound index
+    const index = objectStore.index('trackerId_date_time')
+
+    // Specify the range of values we wish to parse
+    const compoundKeyLowerBound = [trackerId, currentInputDate(), currentInputTime()]
+    const compoundKeyUpperBound = [trackerId, '\uffff', '\uffff']   // \uffff represents the largest unicode character and thus indicates to the cursor that the range it covers should include all possible values for date and time
+    const keyRange = IDBKeyRange.bound(compoundKeyLowerBound, compoundKeyUpperBound)
+
+    // Open a cursor that will iterate over the keyRange in order, thus returning the most recent upcoming events first
+    const cursorRequest = index.openCursor(keyRange)
 
     return new Promise((resolve, reject) => {
 

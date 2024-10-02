@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react"
 import { Link, useLocation } from "react-router-dom"
 import { getEventDate, timeSinceDateArray } from "../../DateHelperFunctions"
-import { getLatestEventWithTrackerId } from "../../IndexedDB/IndexedDB"
+import { getLastEventWithTrackerId } from "../../IndexedDB/IndexedDB"
 
 const TrackerCard = ({ tracker }) => {
 
@@ -12,7 +12,7 @@ const TrackerCard = ({ tracker }) => {
 
     const getAndSetLatestEvent = useCallback(async (trackerId) => {
 
-        getLatestEventWithTrackerId(trackerId)
+        getLastEventWithTrackerId(trackerId)
             .then(event => setLatestEvent(event))
             .catch(error => console.error(error))
 

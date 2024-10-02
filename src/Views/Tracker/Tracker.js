@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react"
 import { Link, useNavigate, useSearchParams, useLocation } from "react-router-dom"
-import { getAllEventsWithTrackerId, getTracker, deleteTracker, deleteEvent, addTracker, putTracker } from "../../IndexedDB/IndexedDB"
-import { getLatestEventWithTrackerId } from "../../IndexedDB/IndexedDB"
+import { getAllEventsWithTrackerId, getTracker, deleteTracker, deleteEvent, addTracker, putTracker, getLastEventWithTrackerId, getNextEventWithTrackerId } from "../../IndexedDB/IndexedDB"
 import { getEventDate, timeSinceDateArray } from "../../DateHelperFunctions"
 import Modal from "../../Shared/Bulma/Modal"
 
@@ -18,12 +17,12 @@ const Tracker = () => {
 
     const [tracker, setTracker] = useState()
     const [editedTracker, setEditedTracker] = useState()
-    const [latestEvent, setLatestEvent] = useState()
+    const [lastEvent, setLastEvent] = useState()
     const [events, setEvents] = useState()
     const [timeSinceArray, setTimeSinceArray] = useState()
     
     const [mode, setMode] = useState(!trackerId ? "create" : "view")
-    const defaultReferrer = "/trackers"    // TODO: When trackers page is created set this to /trackers
+    const defaultReferrer = "/trackers"
 
     const [trackerDeleteModalIsActive, setTrackerDeleteModalIsActive] = useState(false)
     const [eventDeleteModalIsActive, setEventDeleteModalIsActive] = useState(false)
@@ -40,10 +39,10 @@ const Tracker = () => {
 
     }, [])
 
-    const getAndSetLatestEvent = useCallback(async (trackerId) => {
+    const getAndSetLastEvent = useCallback(async (trackerId) => {
 
-        getLatestEventWithTrackerId(trackerId)
-            .then(event => setLatestEvent(event ? event : {}))
+        getLastEventWithTrackerId(trackerId)
+            .then(event => setLastEvent(event ? event : {}))
             .catch(error => console.error(error))
 
     }, [])
@@ -59,22 +58,22 @@ const Tracker = () => {
     useEffect(() => {
 
         getAndSetTracker(trackerId)
-        getAndSetLatestEvent(trackerId)
+        getAndSetLastEvent(trackerId)
         getAndSetEvents(trackerId)
 
-    }, [trackerId, getAndSetTracker, getAndSetLatestEvent, getAndSetEvents])
+    }, [trackerId, getAndSetTracker, getAndSetLastEvent, getAndSetEvents])
 
     useEffect(() => {
 
-        // Don't do anything until the latestEvent has been set
-        if (latestEvent) {
+        // Don't do anything until the lastEvent has been set
+        if (lastEvent) {
 
             // Update timeSinceArray for the first time
-            setTimeSinceArray(timeSinceDateArray(getEventDate(latestEvent)))
+            setTimeSinceArray(timeSinceDateArray(getEventDate(lastEvent)))
 
             // Set an interval to update the timeSinceArray subsequent times
             const interval = setInterval(() => {
-                setTimeSinceArray(timeSinceDateArray(getEventDate(latestEvent)))
+                setTimeSinceArray(timeSinceDateArray(getEventDate(lastEvent)))
             }, 1000)
 
             // Clean up the interval when the component unmounts
@@ -82,7 +81,7 @@ const Tracker = () => {
 
         }
 
-    }, [latestEvent])
+    }, [lastEvent])
 
     const handleTrackerDelete = () => {
 
@@ -105,7 +104,7 @@ const Tracker = () => {
             .then(() => setEventDeleteModalIsActive(false))
             .then(() => getAllEventsWithTrackerId(trackerId))
             .then((events) => setEvents(events))
-            .then(() => getAndSetLatestEvent(trackerId))   // Get and set the latest event in case it was just deleted
+            .then(() => getAndSetLastEvent(trackerId))   // Get and set the last event in case it was just deleted
             .catch(error => console.error(error))
 
     }
@@ -137,6 +136,16 @@ const Tracker = () => {
         }
 
     }
+
+    // useEffect(() => {
+
+    //     getLastEventWithTrackerId(trackerId)
+    //         .then(event => console.log("last", event))
+
+    //     getNextEventWithTrackerId(trackerId)
+    //         .then(event => console.log("next", event))
+
+    // }, [trackerId])
 
     return (
         <div>
@@ -188,7 +197,7 @@ const Tracker = () => {
                     </div>
                     <div className="content has-text-centered is-size-4">
                         <p>
-                            {timeSinceArray[timeSinceArray.length - 1].isPlural ? "have" : "has"} passed since {latestEvent ? "the" : "there is no"} {latestEvent ? <Link to={`/event?id=${latestEvent.id}`}>last event</Link> : "last event."}.
+                            {timeSinceArray[timeSinceArray.length - 1].isPlural ? "have" : "has"} passed since {lastEvent ? "the" : "there is no"} {lastEvent ? <Link to={`/event?id=${lastEvent.id}`}>last event</Link> : "last event."}.
                         </p>            
                     </div>
                 </>}

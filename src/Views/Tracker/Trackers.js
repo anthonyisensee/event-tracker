@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { getAllTrackers, getLatestEventWithTrackerId } from "../../IndexedDB/IndexedDB"
+import { getAllTrackers, getLastEventWithTrackerId } from "../../IndexedDB/IndexedDB"
 import { Link } from "react-router-dom"
 import { timeSinceDateArray, getEventDate } from "../../DateHelperFunctions"
 
@@ -12,7 +12,7 @@ const Trackers = () => {
         getAllTrackers()
             .then(trackers => {
 
-                const latestEvents = trackers.map(tracker => getLatestEventWithTrackerId(tracker.id))
+                const latestEvents = trackers.map(tracker => getLastEventWithTrackerId(tracker.id))
 
                 Promise.all(latestEvents)
                     .then(events => {
