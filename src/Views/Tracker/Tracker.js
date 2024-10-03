@@ -229,16 +229,18 @@ const Tracker = () => {
                                 <select 
                                     name="Targets"
                                     onChange={(e) => setEditedTracker({...editedTracker, targets: e.target.value})}
-                                    defaultValue={tracker?.targets ?? "Past events"}
+                                    defaultValue={tracker?.targets ?? "Only past events"}
                                 >
-                                    <option value="Past events">Past events</option>
-                                    <option value="Future events">Future events</option>
+                                    <option value="Future events, then past events">Future events, then past events</option>
+                                    <option value="Only past events">Only past events</option>
+                                    <option value="Past events, then future events">Past events, then future events</option>
+                                    <option value="Only future events">Only future events</option>
                                 </select>
                             </div>
                         }
                     </div>
                     {mode !== "view" &&
-                        <div className="help"><p>Change whether the tracker tracks time since the last event or until the next event.</p></div>
+                        <div className="help"><p>The events the tracker's timers or countdowns will target.</p></div>
                     }
                 </div>
                 <div className="field is-grouped">

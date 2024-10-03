@@ -57,7 +57,7 @@ function openDatabase() {
                                     
                                     putTracker({
                                         ...tracker,
-                                        targets: "Past events"
+                                        targets: "Future events, then past events"
                                     })
                                         .catch(error => console.error(error))
 

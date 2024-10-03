@@ -142,7 +142,10 @@ const Settings = () => {
             // Add every tracker
             data.trackers.forEach(tracker => {
 
-                const promise = addTracker(tracker)
+                const promise = addTracker({ 
+                    ...tracker, 
+                    targets: tracker.targets ?? "Future events, then past events"
+                })
                     .then(trackerId => {
 
                         // Add each event from the tracker
