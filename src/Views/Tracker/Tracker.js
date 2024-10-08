@@ -229,7 +229,7 @@ const Tracker = () => {
                                 <select 
                                     name="Targets"
                                     onChange={(e) => setEditedTracker({...editedTracker, targets: e.target.value})}
-                                    defaultValue={tracker?.targets ?? "Only past events"}
+                                    defaultValue={tracker?.targets ?? "Future events, then past events"}
                                 >
                                     <option value="Future events, then past events">Future events, then past events</option>
                                     <option value="Only past events">Only past events</option>
