@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react"
-import { defaultTimeBetween, timeBetweenNowAnd } from "../DateHelperFunctions"
+import { timeBetweenNowAnd } from "../DateHelperFunctions"
 import { getLastEventWithTrackerId, getNextEventWithTrackerId } from "../IndexedDB/IndexedDB"
 import { Link } from "react-router-dom"
 
-// TODO: Refactor tracker to trackerTargets so that re-render only runs when targets property changes
 const TimeDisplay = ({ tracker, numberSize, unitSize, textSize }) => {
 
     const [displayEvent, setDisplayEvent] = useState()
