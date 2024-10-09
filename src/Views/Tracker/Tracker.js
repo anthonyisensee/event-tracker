@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react"
 import { Link, useNavigate, useSearchParams, useLocation } from "react-router-dom"
 import { getAllEventsWithTrackerId, getTracker, deleteTracker, deleteEvent, addTracker, putTracker, getLastEventWithTrackerId, getNextEventWithTrackerId } from "../../IndexedDB/IndexedDB"
-import { getEventDate, timeSinceDateArray } from "../../DateHelperFunctions"
+import { getEventDate, timeBetween, timeSinceDateArray } from "../../DateHelperFunctions"
 import Modal from "../../Shared/Bulma/Modal"
 
 const Tracker = () => {
@@ -17,9 +17,9 @@ const Tracker = () => {
 
     const [tracker, setTracker] = useState()
     const [editedTracker, setEditedTracker] = useState()
-    const [lastEvent, setLastEvent] = useState()
+    const [displayEvent, setDisplayEvent] = useState()
     const [events, setEvents] = useState()
-    const [timeSinceArray, setTimeSinceArray] = useState()
+    const [timeDisplayTimeBetween, setTimeDisplayTimeBetween] = useState()
     
     const [mode, setMode] = useState(!trackerId ? "create" : "view")
     const defaultReferrer = "/trackers"
@@ -39,11 +39,48 @@ const Tracker = () => {
 
     }, [])
 
-    const getAndSetLastEvent = useCallback(async (trackerId) => {
+    const getAndSetDisplayEvent = useCallback(async (tracker) => {
 
-        getLastEventWithTrackerId(trackerId)
-            .then(event => setLastEvent(event ? event : {}))
-            .catch(error => console.error(error))
+        if (tracker.targets === "Only future events" || tracker.targets === "Future events, then past events") {
+
+            getNextEventWithTrackerId(tracker.id)
+                .then(event => {
+
+                    // Needs to happen whether or not a next event exists
+                    setDisplayEvent(event)
+
+                    // If the next event doesn't exist and the right targeting mode has been set search for a last event
+                    if (!event && tracker.targets === "Future events, then past events") {
+
+                        getLastEventWithTrackerId(tracker.id)
+                            .then(event => setDisplayEvent(event))
+                            .catch(error => console.error(error))
+
+                    }
+
+                })
+                .catch(error => console.error(error))
+        
+        } else if (tracker.targets === "Only past events" || tracker.targets === "Past events, then future events") { 
+                
+            getLastEventWithTrackerId(tracker.id)
+                .then(event => {
+
+                    setDisplayEvent(event)
+
+                    // If the last event doesn't exist and the right targeting mode has been set search for a next event
+                    if (!event && tracker.targets === "Past events, then future events") {
+
+                        getNextEventWithTrackerId(tracker.id)
+                            .then(event => setDisplayEvent(event))
+                            .catch(error => console.error(error))
+
+                    }
+
+                })
+                .catch(error => console.error(error))
+
+        }
 
     }, [])
 
@@ -58,22 +95,28 @@ const Tracker = () => {
     useEffect(() => {
 
         getAndSetTracker(trackerId)
-        getAndSetLastEvent(trackerId)
         getAndSetEvents(trackerId)
 
-    }, [trackerId, getAndSetTracker, getAndSetLastEvent, getAndSetEvents])
+    }, [trackerId, getAndSetTracker, getAndSetEvents])
+
+    // Once the tracker object has been loaded get the most relevant event and set it to the time display.
+    useEffect(() => {
+
+        tracker && getAndSetDisplayEvent(tracker)
+        
+    }, [tracker, getAndSetDisplayEvent])
 
     useEffect(() => {
 
-        // Don't do anything until the lastEvent has been set
-        if (lastEvent) {
+        // Don't do anything until the displayEvent has been set
+        if (displayEvent) {
 
             // Update timeSinceArray for the first time
-            setTimeSinceArray(timeSinceDateArray(getEventDate(lastEvent)))
+            setTimeDisplayTimeBetween(timeBetween(displayEvent))
 
             // Set an interval to update the timeSinceArray subsequent times
             const interval = setInterval(() => {
-                setTimeSinceArray(timeSinceDateArray(getEventDate(lastEvent)))
+                setTimeDisplayTimeBetween(timeBetween(displayEvent))
             }, 1000)
 
             // Clean up the interval when the component unmounts
@@ -81,7 +124,7 @@ const Tracker = () => {
 
         }
 
-    }, [lastEvent])
+    }, [displayEvent])
 
     const handleTrackerDelete = () => {
 
@@ -104,7 +147,7 @@ const Tracker = () => {
             .then(() => setEventDeleteModalIsActive(false))
             .then(() => getAllEventsWithTrackerId(trackerId))
             .then((events) => setEvents(events))
-            .then(() => getAndSetLastEvent(trackerId))   // Get and set the last event in case it was just deleted
+            .then(() => getAndSetDisplayEvent(tracker))   // Get and set the display event in case it was just deleted
             .catch(error => console.error(error))
 
     }
@@ -136,16 +179,6 @@ const Tracker = () => {
         }
 
     }
-
-    // useEffect(() => {
-
-    //     getLastEventWithTrackerId(trackerId)
-    //         .then(event => console.log("last", event))
-
-    //     getNextEventWithTrackerId(trackerId)
-    //         .then(event => console.log("next", event))
-
-    // }, [trackerId])
 
     return (
         <div>
@@ -186,9 +219,9 @@ const Tracker = () => {
                 <div className="content has-text-centered">
                     <h1>{tracker.name ?? <span className="is-italic">Unnamed Tracker</span>}</h1>
                 </div>
-                {timeSinceArray && <>
-                    <div className="time-since has-text-centered is-flex is-justify-content-center">
-                        {timeSinceArray && timeSinceArray.map((time, index) => (
+                {timeDisplayTimeBetween && <>
+                    <div className="has-text-centered is-flex is-justify-content-center">
+                        {timeDisplayTimeBetween && timeDisplayTimeBetween.timeUnits.map((time, index) => (
                             <div className="mb-5 ml-5 mr-5" key={index}>
                                 <p className="number is-size-1 has-text-weight-bold">{time.number}</p>
                                 <p className="unit is-size-5">{time.unit}</p>
@@ -197,8 +230,15 @@ const Tracker = () => {
                     </div>
                     <div className="content has-text-centered is-size-4">
                         <p>
-                            {timeSinceArray[timeSinceArray.length - 1].isPlural ? "have" : "has"} passed since {lastEvent ? "the" : "there is no"} {lastEvent ? <Link to={`/event?id=${lastEvent.id}`}>last event</Link> : "last event."}.
-                        </p>            
+                            {!timeDisplayTimeBetween.inFuture && <>
+                                {timeDisplayTimeBetween.timeUnits[timeDisplayTimeBetween.timeUnits.length - 1].isPlural 
+                                        ? "have" : "has"
+                                } passed since {displayEvent ? "the" : "there is no"} {displayEvent ? <Link to={`/event?id=${displayEvent.id}`}>last event</Link> : "last event."}.
+                            </>}
+                            {timeDisplayTimeBetween.inFuture && <>
+                                until the { displayEvent ? <Link to={`/event?id=${displayEvent.id}`}>next event</Link> : "next event"}.
+                            </>}
+                        </p>
                     </div>
                 </>}
             </>}
