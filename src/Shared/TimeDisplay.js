@@ -57,7 +57,6 @@ const TimeDisplay = ({ tracker, numberSize, unitSize, textSize }) => {
 
     useEffect(() => {
 
-
         if (tracker) {
             getAndSetDisplayEvent(tracker)
         }
@@ -131,8 +130,6 @@ const TimeDisplay = ({ tracker, numberSize, unitSize, textSize }) => {
         return "...something went wrong."
 
     }
-
-
 
     return (
         <div>
