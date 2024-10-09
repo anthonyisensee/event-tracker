@@ -1,0 +1,158 @@
+import { useState, useEffect } from "react"
+import { defaultTimeBetween, timeBetweenNowAnd } from "../DateHelperFunctions"
+import { getLastEventWithTrackerId, getNextEventWithTrackerId } from "../IndexedDB/IndexedDB"
+import { Link } from "react-router-dom"
+
+// TODO: Refactor tracker to trackerTargets so that re-render only runs when targets property changes
+const TimeDisplay = ({ tracker, numberSize, unitSize, textSize }) => {
+
+    const [displayEvent, setDisplayEvent] = useState()
+    
+    const [timeBetweenObject, setTimeBetweenObject] = useState(timeBetweenNowAnd(null, tracker))
+
+    const getAndSetDisplayEvent = (tracker) => {
+        
+        if (tracker.targets === "Only future events" || tracker.targets === "Future events, then past events") {
+
+            getNextEventWithTrackerId(tracker.id)
+                .then(event => {
+
+                    // Needs to happen whether or not a next event exists
+                    setDisplayEvent(event)
+
+                    // If the next event doesn't exist and the right targeting mode has been set search for a last event
+                    if (!event && tracker.targets === "Future events, then past events") {
+
+                        getLastEventWithTrackerId(tracker.id)
+                            .then(event => setDisplayEvent(event))                            
+                            .catch(error => console.error(error))
+
+                    }
+
+                })
+                .catch(error => console.error(error))
+        
+        } 
+        else if (tracker.targets === "Only past events" || tracker.targets === "Past events, then future events") { 
+                
+            getLastEventWithTrackerId(tracker.id)
+                .then(event => {
+
+                    setDisplayEvent(event)
+
+                    // If the last event doesn't exist and the right targeting mode has been set search for a next event
+                    if (!event && tracker.targets === "Past events, then future events") {
+
+                        getNextEventWithTrackerId(tracker.id)
+                            .then(event => setDisplayEvent(event))                            
+                            .catch(error => console.error(error))
+
+                    }
+
+                })
+                .catch(error => console.error(error))
+
+        }
+
+    }
+
+    useEffect(() => {
+
+
+        if (tracker) {
+            getAndSetDisplayEvent(tracker)
+        }
+
+    }, [tracker])
+
+    useEffect(() => {
+
+        // Update time between object (this must happen regardless of a display event)
+        setTimeBetweenObject(timeBetweenNowAnd(displayEvent, tracker))
+
+        // If there is a display event
+        if (displayEvent) {
+
+            // Set an interval that updates the time between object every second
+            const interval = setInterval(() => {
+                setTimeBetweenObject(timeBetweenNowAnd(displayEvent, tracker))
+            }, 1000)
+
+            // Clean up the interval when the component unmounts
+            return () => clearInterval(interval)
+
+        }
+
+    }, [displayEvent, tracker])
+
+    const buildDescription = (displayEvent, timeBetweenObject, tracker) => {
+
+        // If a relevant event exists we want to build our text based on the isFuture property of the timeBetweenObject.
+        if (displayEvent) {
+
+            if (timeBetweenObject.inFuture) {
+                
+                return (
+                    <>until the <Link to={`/event?id=${displayEvent.id}`}>next event</Link>.</>
+                )
+
+            } else {
+
+                const wordWithCorrectTense = timeBetweenObject.timeUnits[timeBetweenObject.timeUnits.length - 1].isPlural ? "have" : "has"
+
+                return (
+                    <>{wordWithCorrectTense} passed since the <Link to={`/event?id=${displayEvent.id}`}>last event</Link>.</>
+                )
+
+            }
+
+        } 
+        // If a relevant event does not exist, we want to build text based on the tracker's default targeting.
+        else {
+
+            if (tracker.targets === "Only past events" || tracker.targets === "Past events, then future events") {
+
+                return `has passed since the last event.`
+
+            } 
+            else if (tracker.targets === "Only future events" || tracker.targets === "Future events, then past events") {
+
+                return `until the next event.`
+
+            }
+            else {
+
+                console.error("TimeDisplay does not account for all possible options of tracker property targets.")
+
+            }
+
+        }
+
+        // If nothing has been returned at this point something has gone wrong. Return a default.
+        return "...something went wrong."
+
+    }
+
+
+
+    return (
+        <div>
+            {timeBetweenObject && <>
+                <div className="has-text-centered is-flex is-justify-content-center">
+                    {timeBetweenObject.timeUnits.map((time, index) => (
+                        <div className="mb-5 ml-5 mr-5" key={index}>
+                            <p className="number is-size-1 has-text-weight-bold">{time.number}</p>
+                            <p className="unit is-size-5">{time.unit}</p>
+                        </div>
+                    ))}
+                </div>
+                <div className="content has-text-centered is-size-4">
+                    <p>{buildDescription(displayEvent, timeBetweenObject, tracker)}</p>
+                </div>
+            </>}
+        </div>
+    )
+
+}
+
+export default TimeDisplay

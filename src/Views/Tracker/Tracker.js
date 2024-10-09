@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from "react"
 import { Link, useNavigate, useSearchParams, useLocation } from "react-router-dom"
-import { getAllEventsWithTrackerId, getTracker, deleteTracker, deleteEvent, addTracker, putTracker, getLastEventWithTrackerId, getNextEventWithTrackerId } from "../../IndexedDB/IndexedDB"
-import { getEventDate, timeBetween, timeSinceDateArray } from "../../DateHelperFunctions"
+import { getAllEventsWithTrackerId, getTracker, deleteTracker, deleteEvent, addTracker, putTracker } from "../../IndexedDB/IndexedDB"
 import Modal from "../../Shared/Bulma/Modal"
+import TimeDisplay from "../../Shared/TimeDisplay"
 
 const Tracker = () => {
     
@@ -17,9 +17,7 @@ const Tracker = () => {
 
     const [tracker, setTracker] = useState()
     const [editedTracker, setEditedTracker] = useState()
-    const [displayEvent, setDisplayEvent] = useState()
     const [events, setEvents] = useState()
-    const [timeDisplayTimeBetween, setTimeDisplayTimeBetween] = useState()
     
     const [mode, setMode] = useState(!trackerId ? "create" : "view")
     const defaultReferrer = "/trackers"
@@ -39,51 +37,6 @@ const Tracker = () => {
 
     }, [])
 
-    const getAndSetDisplayEvent = useCallback(async (tracker) => {
-
-        if (tracker.targets === "Only future events" || tracker.targets === "Future events, then past events") {
-
-            getNextEventWithTrackerId(tracker.id)
-                .then(event => {
-
-                    // Needs to happen whether or not a next event exists
-                    setDisplayEvent(event)
-
-                    // If the next event doesn't exist and the right targeting mode has been set search for a last event
-                    if (!event && tracker.targets === "Future events, then past events") {
-
-                        getLastEventWithTrackerId(tracker.id)
-                            .then(event => setDisplayEvent(event))
-                            .catch(error => console.error(error))
-
-                    }
-
-                })
-                .catch(error => console.error(error))
-        
-        } else if (tracker.targets === "Only past events" || tracker.targets === "Past events, then future events") { 
-                
-            getLastEventWithTrackerId(tracker.id)
-                .then(event => {
-
-                    setDisplayEvent(event)
-
-                    // If the last event doesn't exist and the right targeting mode has been set search for a next event
-                    if (!event && tracker.targets === "Past events, then future events") {
-
-                        getNextEventWithTrackerId(tracker.id)
-                            .then(event => setDisplayEvent(event))
-                            .catch(error => console.error(error))
-
-                    }
-
-                })
-                .catch(error => console.error(error))
-
-        }
-
-    }, [])
-
     const getAndSetEvents = useCallback(async (trackerId) => {
 
         getAllEventsWithTrackerId(trackerId)
@@ -98,33 +51,6 @@ const Tracker = () => {
         getAndSetEvents(trackerId)
 
     }, [trackerId, getAndSetTracker, getAndSetEvents])
-
-    // Once the tracker object has been loaded get the most relevant event and set it to the time display.
-    useEffect(() => {
-
-        tracker && getAndSetDisplayEvent(tracker)
-        
-    }, [tracker, getAndSetDisplayEvent])
-
-    useEffect(() => {
-
-        // Don't do anything until the displayEvent has been set
-        if (displayEvent) {
-
-            // Update timeSinceArray for the first time
-            setTimeDisplayTimeBetween(timeBetween(displayEvent))
-
-            // Set an interval to update the timeSinceArray subsequent times
-            const interval = setInterval(() => {
-                setTimeDisplayTimeBetween(timeBetween(displayEvent))
-            }, 1000)
-
-            // Clean up the interval when the component unmounts
-            return () => clearInterval(interval)
-
-        }
-
-    }, [displayEvent])
 
     const handleTrackerDelete = () => {
 
@@ -147,7 +73,7 @@ const Tracker = () => {
             .then(() => setEventDeleteModalIsActive(false))
             .then(() => getAllEventsWithTrackerId(trackerId))
             .then((events) => setEvents(events))
-            .then(() => getAndSetDisplayEvent(tracker))   // Get and set the display event in case it was just deleted
+            .then(() => {})   // TODO: Add time display update on event deletion.
             .catch(error => console.error(error))
 
     }
@@ -219,28 +145,7 @@ const Tracker = () => {
                 <div className="content has-text-centered">
                     <h1>{tracker.name ?? <span className="is-italic">Unnamed Tracker</span>}</h1>
                 </div>
-                {timeDisplayTimeBetween && <>
-                    <div className="has-text-centered is-flex is-justify-content-center">
-                        {timeDisplayTimeBetween && timeDisplayTimeBetween.timeUnits.map((time, index) => (
-                            <div className="mb-5 ml-5 mr-5" key={index}>
-                                <p className="number is-size-1 has-text-weight-bold">{time.number}</p>
-                                <p className="unit is-size-5">{time.unit}</p>
-                            </div>
-                        ))}
-                    </div>
-                    <div className="content has-text-centered is-size-4">
-                        <p>
-                            {!timeDisplayTimeBetween.inFuture && <>
-                                {timeDisplayTimeBetween.timeUnits[timeDisplayTimeBetween.timeUnits.length - 1].isPlural 
-                                        ? "have" : "has"
-                                } passed since {displayEvent ? "the" : "there is no"} {displayEvent ? <Link to={`/event?id=${displayEvent.id}`}>last event</Link> : "last event."}.
-                            </>}
-                            {timeDisplayTimeBetween.inFuture && <>
-                                until the { displayEvent ? <Link to={`/event?id=${displayEvent.id}`}>next event</Link> : "next event"}.
-                            </>}
-                        </p>
-                    </div>
-                </>}
+                <TimeDisplay tracker={tracker}/>
             </>}
             <div className="content mt-6">
                 <h2>{mode !== "view" ? mode.charAt(0).toUpperCase() + mode.slice(1) + " " : ""}Tracker</h2>
