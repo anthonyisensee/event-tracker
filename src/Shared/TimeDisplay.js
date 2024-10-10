@@ -1,7 +1,9 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { timeBetweenNowAnd } from "../DateHelperFunctions"
 import { getLastEventWithTrackerId, getNextEventWithTrackerId } from "../IndexedDB/IndexedDB"
 import { Link } from "react-router-dom"
+import TrackerModel from "../Models/TrackerModel"
+
 
 const TimeDisplay = ({ tracker, numberSize, unitSize, textSize }) => {
 
@@ -9,9 +11,12 @@ const TimeDisplay = ({ tracker, numberSize, unitSize, textSize }) => {
     
     const [timeBetweenObject, setTimeBetweenObject] = useState(timeBetweenNowAnd(null, tracker))
 
-    const getAndSetDisplayEvent = (tracker) => {
+    const getAndSetDisplayEvent = useCallback((tracker) => {
+
+        const trackerModel = new TrackerModel()
+        const label = trackerModel.getTrackerTargetsOptionLabel(tracker.targets)
         
-        if (tracker.targets === "Only future events" || tracker.targets === "Future events, then past events") {
+        if (label === "Only future events" || label === "Future events, then past events") {
 
             getNextEventWithTrackerId(tracker.id)
                 .then(event => {
@@ -20,7 +25,7 @@ const TimeDisplay = ({ tracker, numberSize, unitSize, textSize }) => {
                     setDisplayEvent(event)
 
                     // If the next event doesn't exist and the right targeting mode has been set search for a last event
-                    if (!event && tracker.targets === "Future events, then past events") {
+                    if (!event && label === "Future events, then past events") {
 
                         getLastEventWithTrackerId(tracker.id)
                             .then(event => setDisplayEvent(event))                            
@@ -32,7 +37,7 @@ const TimeDisplay = ({ tracker, numberSize, unitSize, textSize }) => {
                 .catch(error => console.error(error))
         
         } 
-        else if (tracker.targets === "Only past events" || tracker.targets === "Past events, then future events") { 
+        else if (label === "Only past events" || label === "Past events, then future events") { 
                 
             getLastEventWithTrackerId(tracker.id)
                 .then(event => {
@@ -40,7 +45,7 @@ const TimeDisplay = ({ tracker, numberSize, unitSize, textSize }) => {
                     setDisplayEvent(event)
 
                     // If the last event doesn't exist and the right targeting mode has been set search for a next event
-                    if (!event && tracker.targets === "Past events, then future events") {
+                    if (!event && label === "Past events, then future events") {
 
                         getNextEventWithTrackerId(tracker.id)
                             .then(event => setDisplayEvent(event))                            
@@ -53,7 +58,7 @@ const TimeDisplay = ({ tracker, numberSize, unitSize, textSize }) => {
 
         }
 
-    }
+    }, [])
 
     useEffect(() => {
 
@@ -61,7 +66,7 @@ const TimeDisplay = ({ tracker, numberSize, unitSize, textSize }) => {
             getAndSetDisplayEvent(tracker)
         }
 
-    }, [tracker])
+    }, [tracker, getAndSetDisplayEvent])
 
     useEffect(() => {
 
@@ -81,7 +86,7 @@ const TimeDisplay = ({ tracker, numberSize, unitSize, textSize }) => {
 
         }
 
-    }, [displayEvent, tracker])
+    }, [tracker, displayEvent])
 
     const buildDescription = (displayEvent, timeBetweenObject, tracker) => {
 
@@ -108,12 +113,15 @@ const TimeDisplay = ({ tracker, numberSize, unitSize, textSize }) => {
         // If a relevant event does not exist, we want to build text based on the tracker's default targeting.
         else {
 
-            if (tracker.targets === "Only past events" || tracker.targets === "Past events, then future events") {
+            const trackerModel = new TrackerModel()
+            const label = trackerModel.getTrackerTargetsOptionLabel(tracker.targets)
+
+            if (label === "Only past events" || label === "Past events, then future events") {
 
                 return `has passed since the last event.`
 
             } 
-            else if (tracker.targets === "Only future events" || tracker.targets === "Future events, then past events") {
+            else if (label === "Only future events" || label === "Future events, then past events") {
 
                 return `until the next event.`
 

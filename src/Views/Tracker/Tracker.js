@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams, useLocation } from "react-router-do
 import { getAllEventsWithTrackerId, getTracker, deleteTracker, deleteEvent, addTracker, putTracker } from "../../IndexedDB/IndexedDB"
 import Modal from "../../Shared/Bulma/Modal"
 import TimeDisplay from "../../Shared/TimeDisplay"
+import TrackerModel from "../../Models/TrackerModel"
 
 const Tracker = () => {
     
@@ -25,6 +26,8 @@ const Tracker = () => {
     const [trackerDeleteModalIsActive, setTrackerDeleteModalIsActive] = useState(false)
     const [eventDeleteModalIsActive, setEventDeleteModalIsActive] = useState(false)
     const [eventToDelete, setEventToDelete] = useState({})
+
+    const trackerModel = new TrackerModel()
 
     const getAndSetTracker = useCallback(async (trackerId) => {
 
@@ -73,7 +76,13 @@ const Tracker = () => {
             .then(() => setEventDeleteModalIsActive(false))
             .then(() => getAllEventsWithTrackerId(trackerId))
             .then((events) => setEvents(events))
-            .then(() => {})   // TODO: Add time display update on event deletion.
+            .then(() => {
+                // Toggle the value of a property on the tracker to force the time display to re-render
+                setTracker({ 
+                    ...tracker, 
+                    propertyToForceRerender: !tracker.propertyToForceRerender 
+                })
+            })
             .catch(error => console.error(error))
 
     }
@@ -168,18 +177,20 @@ const Tracker = () => {
                 <div className="field">
                     <label className="label">Targets</label>
                     <div className="control">
-                        {mode === "view" && <p>{tracker?.targets}</p>}
+                        {mode === "view" && <p>{trackerModel.properties.targets.options[tracker?.targets]?.label}</p>}
                         {mode !== "view" &&
                             <div className="select">
                                 <select 
                                     name="Targets"
                                     onChange={(e) => setEditedTracker({...editedTracker, targets: e.target.value})}
-                                    defaultValue={tracker?.targets ?? "Future events, then past events"}
+                                    defaultValue={
+                                        tracker?.targets ?? 
+                                        trackerModel.properties.targets.options[trackerModel.properties.targets.defaultOptionIndex]
+                                    }
                                 >
-                                    <option value="Future events, then past events">Future events, then past events</option>
-                                    <option value="Only past events">Only past events</option>
-                                    <option value="Past events, then future events">Past events, then future events</option>
-                                    <option value="Only future events">Only future events</option>
+                                    {trackerModel.properties.targets.options.map((option, index) => { return (
+                                        <option key={index} value={option.value}>{option.label}</option>
+                                    )})}
                                 </select>
                             </div>
                         }

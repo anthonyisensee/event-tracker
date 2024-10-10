@@ -1,3 +1,5 @@
+import TrackerModel from "./Models/TrackerModel"
+
 export function timeSinceDateArray(event) {
 
     // If a null date was provided short circuit and return an array indicating infinite time.
@@ -63,11 +65,15 @@ export function timeBetweenNowAnd(event, tracker) {
             inFuture: true,
             timeUnits: [{ unit: "time", number: "REPLACE", isPlural: false }]
         }
+
+        const trackerModel = new TrackerModel()
+        const label = trackerModel.getTrackerTargetsOptionLabel(tracker.targets)
+
         
-        if (tracker.targets === "Only future events" || tracker.targets === "Future events, then past events") {
+        if (label === "Only future events" || label === "Future events, then past events") {
             defaultObject.timeUnits[0].number = "∞"
         }
-        else if (tracker.targets === "Only past events" || tracker.targets === "Past events, then future events") {
+        else if (label === "Only past events" || label === "Past events, then future events") {
             defaultObject.timeUnits[0].number = "🛇"
         }
 
