@@ -93,7 +93,13 @@ const Tracker = () => {
 
         if (mode === "create") {
 
-            addTracker(editedTracker ?? {})
+            // Set defaults for required properties if no values have been provided
+            const trackerToAdd = {
+                targets: trackerModel.properties.targets.defaultOptionIndex,
+                ...editedTracker,
+            }
+            
+            addTracker(trackerToAdd)
                 .then(() => {
 
                     // If a referrer exists, navigate to it
@@ -169,7 +175,10 @@ const Tracker = () => {
                                 type="text" 
                                 className="input" 
                                 defaultValue={tracker?.name}
-                                onChange={(e) => setEditedTracker({...editedTracker, name: e.target.value})}
+                                onChange={(e) => setEditedTracker({
+                                    ...editedTracker, 
+                                    name: e.target.value
+                                })}
                             />
                         }
                     </div>
@@ -182,7 +191,10 @@ const Tracker = () => {
                             <div className="select">
                                 <select 
                                     name="Targets"
-                                    onChange={(e) => setEditedTracker({...editedTracker, targets: e.target.value})}
+                                    onChange={(e) => setEditedTracker({
+                                        ...editedTracker, 
+                                        targets: e.target.value
+                                    })}
                                     defaultValue={
                                         tracker?.targets ?? 
                                         trackerModel.properties.targets.options[trackerModel.properties.targets.defaultOptionIndex]

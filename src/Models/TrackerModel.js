@@ -25,7 +25,12 @@ export default class Tracker {
     getTrackerTargetsOptionLabel(trackerTargetsValue){
 
         const matchingValues = this.properties.targets.options.filter(option => option.value === parseInt(trackerTargetsValue))
-        return matchingValues[0].label
+
+        if (matchingValues.length === 0) {
+            console.error("No matching values found for trackerTargetsValue.")
+        } else {
+            return matchingValues[0].label
+        }
     
     }
 
