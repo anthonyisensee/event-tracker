@@ -1,4 +1,5 @@
 import { currentInputDate, currentInputTime } from "../DateHelperFunctions"
+import TrackerModel from "../Models/TrackerModel"
 
 const databaseName = 'event-tracker'
 const databaseCurrentVersion = 3
@@ -54,10 +55,12 @@ function openDatabase() {
                             trackers.forEach(tracker => {
 
                                 if (!tracker.targets) {
+
+                                    const trackerModel = new TrackerModel()
                                     
                                     putTracker({
                                         ...tracker,
-                                        targets: "Future events, then past events"
+                                        targets: trackerModel.properties.targets.defaultOptionIndex
                                     })
                                         .catch(error => console.error(error))
 
