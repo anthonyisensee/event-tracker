@@ -5,7 +5,7 @@ import { Link } from "react-router-dom"
 import TrackerModel from "../Models/TrackerModel"
 
 
-const TimeDisplay = ({ tracker, numberSize, unitSize, textSize }) => {
+const TimeDisplay = ({ tracker, timesContainerClassName, timesClassName, unitsClassName, descriptionClassName }) => {
 
     const [displayEvent, setDisplayEvent] = useState()
     
@@ -139,18 +139,23 @@ const TimeDisplay = ({ tracker, numberSize, unitSize, textSize }) => {
 
     }
 
+    timesContainerClassName = timesContainerClassName ?? "ml-1 mr-1 mb-3"
+    timesClassName = timesClassName ?? "is-size-4"
+    unitsClassName = unitsClassName ?? "is-size-7"
+    descriptionClassName = descriptionClassName ?? "is-size-6 mb-4"
+
     return (
         <div>
             {timeBetweenObject && <>
                 <div className="has-text-centered is-flex is-justify-content-center">
                     {timeBetweenObject.timeUnits.map((time, index) => (
-                        <div className="mb-5 ml-5 mr-5" key={index}>
-                            <p className="number is-size-1 has-text-weight-bold">{time.number}</p>
-                            <p className="unit is-size-5">{time.unit}</p>
+                        <div className={timesContainerClassName} key={index}>
+                            <p className={timesClassName}>{time.number}</p>
+                            <p className={unitsClassName}>{time.unit}</p>
                         </div>
                     ))}
                 </div>
-                <div className="content has-text-centered is-size-4">
+                <div className={`content has-text-centered ${descriptionClassName}`}>
                     <p>{buildDescription(displayEvent, timeBetweenObject, tracker)}</p>
                 </div>
             </>}

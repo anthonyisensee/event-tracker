@@ -160,7 +160,13 @@ const Tracker = () => {
                 <div className="content has-text-centered">
                     <h1>{tracker.name ?? <span className="is-italic">Unnamed Tracker</span>}</h1>
                 </div>
-                <TimeDisplay tracker={tracker}/>
+                <TimeDisplay
+                    tracker={tracker}
+                    timesContainerClassName={"mb-5 ml-5 mr-5"}
+                    timesClassName={"is-size-1 has-text-weight-bold"}
+                    unitsClassName={"is-size-5"}
+                    descriptionClassName={"is-size-4"}
+                />
             </>}
             <div className="content mt-6">
                 <h2>{mode !== "view" ? mode.charAt(0).toUpperCase() + mode.slice(1) + " " : ""}Tracker</h2>

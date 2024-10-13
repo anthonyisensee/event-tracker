@@ -2,11 +2,13 @@ import { useEffect, useState, useCallback } from "react"
 import { Link, useLocation } from "react-router-dom"
 import { getEventDate, timeSinceDateArray } from "../../DateHelperFunctions"
 import { getLastEventWithTrackerId } from "../../IndexedDB/IndexedDB"
+import TimeDisplay from "../../Shared/TimeDisplay"
 
 const TrackerCard = ({ tracker }) => {
 
     const [latestEvent, setLatestEvent] = useState()
     const [timeSinceArray, setTimeSinceArray] = useState(timeSinceDateArray(null))
+    const [timeBetweenObject, setTimeBetweenObject] = useState()
 
     const location = useLocation()
 
@@ -50,21 +52,13 @@ const TrackerCard = ({ tracker }) => {
                 <div className="content has-text-centered mb-3">
                     <h2 className="is-size-4 mb-0">{tracker.name ?? (<span className="is-italic">Unnamed Tracker</span>)}</h2>
                 </div>
-                <div>
-                    <div className="time-since has-text-centered is-flex is-justify-content-center">
-                        {timeSinceArray.map((time, index) => (
-                            <div className="ml-1 mr-1 mb-3" key={index}>
-                                <p className="number is-size-4">{time.number}</p>
-                                <p className="unit is-size-7">{time.unit}</p>
-                            </div>
-                        ))}
-                    </div>
-                    <div className="content has-text-centered is-size-6 mb-3">
-                        <p>
-                            {timeSinceArray[timeSinceArray.length - 1].isPlural ? "have" : "has"} passed {latestEvent ? "since the" : "as there is no"} {latestEvent ? <Link to={`/event?id=${latestEvent.id}`} state={{ referrer: location.pathname }}>last event</Link> : "last event"}.
-                        </p>
-                    </div>
-                </div>
+                <TimeDisplay 
+                    tracker={tracker}
+                    timesContainerClassName={"ml-1 mr-1 mb-3"}
+                    timesClassName={"is-size-4"}
+                    unitsClassName={"is-size-7"}
+                    descriptionClassName={"is-size-6 mb-4"}
+                />
                 <div className="buttons is-centered">
                     <Link to={`/tracker?id=${tracker.id}`} className="button">View Tracker</Link>
                     <Link to={`/event?trackerid=${tracker.id}`} state={{ referrer: location.pathname }} className="button is-warning">New Event</Link>
