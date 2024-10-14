@@ -50,34 +50,38 @@ export function timeSinceDateArray(event) {
 
 }
 
-// TODO: Months don't always work well, consider the following:
-// console.log(timeBetweenDates(new Date("2024-03-01 11:11:11"),new Date("2024-04-01 11:11:11")))
+// TODO: Improve accuracy on year and month difference.
+console.log(timeBetweenDates(new Date("2024-03-01 11:11:11"),new Date("2024-04-01 11:11:11")))
 export function timeBetweenDates(firstDate, secondDate = new Date(), onlyReturnLargestUnit = false, returnNonLeadingZeroes = false) {
 
     const units = {
         "year": {
-            milliseconds: 31536000000,
-            modUnit: undefined
+            milliseconds: 29030400000,  // One year is 12 months of four weeks each
+            mod: undefined
         },
         "month": { 
-            milliseconds: 2628000000,
-            modUnit: "year"
+            milliseconds: 2419200000,   // One month is four weeks
+            mod: 29030400000
+        },
+        "week": {
+            milliseconds: 604800000,
+            mod: 2419200000
         },
         "day": { 
             milliseconds: 86400000,
-            modUnit: "year"
+            mod: 604800000
         },
         "hour": { 
             milliseconds: 3600000,
-            modUnit: "day"
+            mod: 86400000
         },
         "minute": { 
             milliseconds: 60000,
-            modUnit: "hour"
+            mod: 3600000
         },
         "second": { 
             milliseconds: 1000,
-            modUnit: "minute"
+            mod: 60000
         }
     }
 
@@ -106,9 +110,9 @@ export function timeBetweenDates(firstDate, secondDate = new Date(), onlyReturnL
 
         let number = 0
         
-        if (value.modUnit) {
+        if (value.mod) {
 
-            const moduloMilliseconds = units[value.modUnit].milliseconds
+            const moduloMilliseconds = value.mod
             number = Math.floor((totalMilliseconds % moduloMilliseconds) / value.milliseconds)
         
         } else {
