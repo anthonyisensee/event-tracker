@@ -50,6 +50,93 @@ export function timeSinceDateArray(event) {
 
 }
 
+// TODO: Months don't always work well, consider the following:
+// console.log(timeBetweenDates(new Date("2024-03-01 11:11:11"),new Date("2024-04-01 11:11:11")))
+export function timeBetweenDates(firstDate, secondDate = new Date(), onlyReturnLargestUnit = false, returnNonLeadingZeroes = false) {
+
+    const units = {
+        "year": {
+            milliseconds: 31536000000,
+            modUnit: undefined
+        },
+        "month": { 
+            milliseconds: 2628000000,
+            modUnit: "year"
+        },
+        "day": { 
+            milliseconds: 86400000,
+            modUnit: "year"
+        },
+        "hour": { 
+            milliseconds: 3600000,
+            modUnit: "day"
+        },
+        "minute": { 
+            milliseconds: 60000,
+            modUnit: "hour"
+        },
+        "second": { 
+            milliseconds: 1000,
+            modUnit: "minute"
+        }
+    }
+
+    let totalMilliseconds = secondDate - firstDate
+
+    const inPast = totalMilliseconds / 1000 >= 1
+    const inPresent = -999 < totalMilliseconds && totalMilliseconds < 999
+    const inFuture = !inPast && !inPresent
+    
+    const returnObject = { inPast, inPresent, inFuture }
+
+    if (inPresent) {
+        return { 
+            ...returnObject, 
+            times: [{ number: "Right Now", unit: "" }]
+        }
+    }
+    
+    totalMilliseconds = Math.abs(totalMilliseconds)
+
+    const times = []
+
+    let encounteredNonZeroUnit = false
+
+    for (const [key, value] of Object.entries(units)) {
+
+        let number = 0
+        
+        if (value.modUnit) {
+
+            const moduloMilliseconds = units[value.modUnit].milliseconds
+            number = Math.floor((totalMilliseconds % moduloMilliseconds) / value.milliseconds)
+        
+        } else {
+
+            number = Math.floor(totalMilliseconds / value.milliseconds)
+
+        }
+
+        const unit = key + (number === 1 ? "" : "s")
+
+        if (number > 0 || (returnNonLeadingZeroes && encounteredNonZeroUnit)) {
+
+            encounteredNonZeroUnit = true
+
+            times.push({ number, unit })
+
+            if (onlyReturnLargestUnit) {
+                break
+            }
+
+        }
+
+    }
+
+    return { ...returnObject, times }
+
+}
+
 /**
  * Returns an object with properties that contain information needed for time displays.
  * 
