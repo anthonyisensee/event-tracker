@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react"
-import { timeBetweenNowAnd } from "../DateHelperFunctions"
+import { getEventDate, timeBetweenDates } from "../DateHelperFunctions"
 import { getLastEventWithTrackerId, getNextEventWithTrackerId } from "../IndexedDB/IndexedDB"
 import { Link } from "react-router-dom"
 import TrackerModel from "../Models/TrackerModel"
@@ -8,77 +8,79 @@ import TrackerModel from "../Models/TrackerModel"
 const TimeDisplay = ({ tracker, timesContainerClassName, timesClassName, unitsClassName, descriptionClassName }) => {
 
     const [displayEvent, setDisplayEvent] = useState()
-    
-    const [timeBetweenObject, setTimeBetweenObject] = useState(timeBetweenNowAnd(null, tracker))
+    const [timeBetween, setTimeBetween] = useState(timeBetweenDates(null, null, null, true))
 
-    const getAndSetDisplayEvent = useCallback((tracker) => {
+    const setRelevantDisplayEvent = useCallback((tracker) => {
 
         const trackerModel = new TrackerModel()
         const label = trackerModel.getTrackerTargetsOptionLabel(tracker.targets)
-        
-        if (label === "Only future events" || label === "Future events, then past events") {
 
-            getNextEventWithTrackerId(tracker.id)
-                .then(event => {
+        let initialEventRetrievalFunction
+        let backupEventRetrievalFunction
 
-                    // Needs to happen whether or not a next event exists
-                    setDisplayEvent(event)
+        if (["Only future events", "Future events, then past events"].includes(label)) {
 
-                    // If the next event doesn't exist and the right targeting mode has been set search for a last event
-                    if (!event && label === "Future events, then past events") {
+            initialEventRetrievalFunction = getNextEventWithTrackerId
 
-                        getLastEventWithTrackerId(tracker.id)
-                            .then(event => setDisplayEvent(event))                            
-                            .catch(error => console.error(error))
+            if (label === "Future events, then past events") {
 
-                    }
+                backupEventRetrievalFunction = getLastEventWithTrackerId
 
-                })
-                .catch(error => console.error(error))
-        
+            }
+
         } 
-        else if (label === "Only past events" || label === "Past events, then future events") { 
-                
-            getLastEventWithTrackerId(tracker.id)
-                .then(event => {
+        // else if (["Only future events", "Future events, then past events"].contains(label)) AND any other result for label
+        else {    
+            
+            initialEventRetrievalFunction = getLastEventWithTrackerId
 
-                    setDisplayEvent(event)
+            if (label === "Past events, then future events") {
 
-                    // If the last event doesn't exist and the right targeting mode has been set search for a next event
-                    if (!event && label === "Past events, then future events") {
+                backupEventRetrievalFunction = getNextEventWithTrackerId
 
-                        getNextEventWithTrackerId(tracker.id)
-                            .then(event => setDisplayEvent(event))                            
-                            .catch(error => console.error(error))
-
-                    }
-
-                })
-                .catch(error => console.error(error))
+            }
 
         }
+
+        initialEventRetrievalFunction(tracker.id)
+            .then(event => {
+
+                setDisplayEvent(event)
+
+                if (!event && backupEventRetrievalFunction) {
+                    
+                    backupEventRetrievalFunction(tracker.id)
+                        .then(event => event && setDisplayEvent(event))
+                        .catch(error => console.error(error))
+
+                }
+
+            })
+            .catch(error => console.error(error))
 
     }, [])
 
     useEffect(() => {
 
+        console.log("tracker changed to", tracker)
+
         if (tracker) {
-            getAndSetDisplayEvent(tracker)
+            setRelevantDisplayEvent(tracker)
         }
 
-    }, [tracker, getAndSetDisplayEvent])
+    }, [tracker, setRelevantDisplayEvent])
 
     useEffect(() => {
 
         // Update time between object (this must happen regardless of a display event)
-        setTimeBetweenObject(timeBetweenNowAnd(displayEvent, tracker))
+        setTimeBetween(timeBetweenDates(getEventDate(displayEvent), null, null, true))
 
         // If there is a display event
         if (displayEvent) {
 
             // Set an interval that updates the time between object every second
             const interval = setInterval(() => {
-                setTimeBetweenObject(timeBetweenNowAnd(displayEvent, tracker))
+                setTimeBetween(timeBetweenDates(getEventDate(displayEvent), null, null, true))
             }, 1000)
 
             // Clean up the interval when the component unmounts
@@ -86,26 +88,25 @@ const TimeDisplay = ({ tracker, timesContainerClassName, timesClassName, unitsCl
 
         }
 
-    }, [tracker, displayEvent])
+    }, [displayEvent])
 
-    const buildDescription = (displayEvent, timeBetweenObject, tracker) => {
+    const buildDescription = (displayEvent, timeBetween, tracker) => {
 
-        // If a relevant event exists we want to build our text based on the isFuture property of the timeBetweenObject.
+        // If a relevant event exists we want to build our text based on the isFuture property of the timeBetween.
         if (displayEvent) {
 
-            if (timeBetweenObject.inFuture) {
+            if (timeBetween.inFuture) {
                 
-                return (
-                    <>until the <Link to={`/event?id=${displayEvent.id}`}>next event</Link>.</>
-                )
+                return <>until the <Link to={`/event?id=${displayEvent.id}`}>next event</Link>.</>
 
-            } else {
+            } else if (timeBetween.inPresent) {
 
-                const wordWithCorrectTense = timeBetweenObject.timeUnits[timeBetweenObject.timeUnits.length - 1].isPlural ? "have" : "has"
+                return <>The <Link to={`/event?id=${displayEvent.id}`}>current event</Link> is now.</>
 
-                return (
-                    <>{wordWithCorrectTense} passed since the <Link to={`/event?id=${displayEvent.id}`}>last event</Link>.</>
-                )
+            } else {    // timeBetween.inPast serves as the default
+
+                const wordWithCorrectTense = timeBetween.times[timeBetween.times.length - 1].isPlural ? "have" : "has"
+                return <>{wordWithCorrectTense} passed since the <Link to={`/event?id=${displayEvent.id}`}>last event</Link>.</>
 
             }
 
@@ -146,9 +147,9 @@ const TimeDisplay = ({ tracker, timesContainerClassName, timesClassName, unitsCl
 
     return (
         <div>
-            {timeBetweenObject && <>
+            {timeBetween && <>
                 <div className="has-text-centered is-flex is-justify-content-center">
-                    {timeBetweenObject.timeUnits.map((time, index) => (
+                    {timeBetween.times.map((time, index) => (
                         <div className={timesContainerClassName} key={index}>
                             <p className={timesClassName}>{time.number}</p>
                             <p className={unitsClassName}>{time.unit}</p>
@@ -156,7 +157,7 @@ const TimeDisplay = ({ tracker, timesContainerClassName, timesClassName, unitsCl
                     ))}
                 </div>
                 <div className={`content has-text-centered ${descriptionClassName}`}>
-                    <p>{buildDescription(displayEvent, timeBetweenObject, tracker)}</p>
+                    <p>{buildDescription(displayEvent, timeBetween, tracker)}</p>
                 </div>
             </>}
         </div>

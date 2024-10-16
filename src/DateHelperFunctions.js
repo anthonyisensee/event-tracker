@@ -51,8 +51,19 @@ export function timeSinceDateArray(event) {
 }
 
 // TODO: Improve accuracy on year and month difference.
-console.log(timeBetweenDates(new Date("2024-03-01 11:11:11"),new Date("2024-04-01 11:11:11")))
-export function timeBetweenDates(firstDate, secondDate = new Date(), onlyReturnLargestUnit = false, returnNonLeadingZeroes = false) {
+/**
+ * Returns an object with properties that contain information needed for time displays.
+ * 
+ * @param {Date} firstDate First date object. Defaults to the current date.
+ * @param {Date} secondDate Second date object. Defaults to the current date.
+ * @param {Boolean} onlyReturnLargestUnit If true will return an object with times that contain only the largest difference unit. Defaults to false.
+ * @param {Boolean} returnNonLeadingZeroes If true will return an object with times that include non-leading zeroes. Defaults to false. 
+ * @returns {Object} Object containing a times array ordered in descending order from smallest to largest unit. Each object in this array contains an integer number representing the number of this specific unit, a string representing the unit, and a isPlural boolean representing there being 0 or more than 1 of the unit. The return object also contains inPast, inPresent, and inPast booleans that represent when the time difference occurred. Only one of these booleans will ever be true. 
+ */
+export function timeBetweenDates(firstDate, secondDate, onlyReturnLargestUnit = false, returnNonLeadingZeroes = false) {
+
+    firstDate ??= new Date()
+    secondDate ??= new Date()
 
     const units = {
         "year": {
@@ -96,7 +107,7 @@ export function timeBetweenDates(firstDate, secondDate = new Date(), onlyReturnL
     if (inPresent) {
         return { 
             ...returnObject, 
-            times: [{ number: "Right Now", unit: "" }]
+            times: [{ number: "Now", unit: "Time" }]
         }
     }
     
@@ -121,13 +132,15 @@ export function timeBetweenDates(firstDate, secondDate = new Date(), onlyReturnL
 
         }
 
-        const unit = key + (number === 1 ? "" : "s")
+        const isPlural = number !== 1
+
+        const unit = key + (isPlural ? "s" : "")
 
         if (number > 0 || (returnNonLeadingZeroes && encounteredNonZeroUnit)) {
 
             encounteredNonZeroUnit = true
 
-            times.push({ number, unit })
+            times.push({ number, unit, isPlural })
 
             if (onlyReturnLargestUnit) {
                 break
