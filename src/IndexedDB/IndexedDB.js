@@ -360,6 +360,64 @@ export async function getNextEventWithTrackerId(trackerId) {
 
 }
 
+export async function getMostRelevantEventForTracker(tracker) {
+
+    return new Promise((resolve, reject) => {
+
+        let relevantEvent
+
+        const trackerModel = new TrackerModel()
+        const label = trackerModel.getTrackerTargetsOptionLabel(tracker.targets)
+
+        let initialEventRetrievalFunction
+        let backupEventRetrievalFunction
+
+        if (["Only future events", "Future events, then past events"].includes(label)) {
+
+            initialEventRetrievalFunction = getNextEventWithTrackerId
+
+            if (label === "Future events, then past events") {
+
+                backupEventRetrievalFunction = getLastEventWithTrackerId
+
+            }
+
+        } 
+        // else if (["Only future events", "Future events, then past events"].contains(label)) AND any other result for label
+        else {    
+            
+            initialEventRetrievalFunction = getLastEventWithTrackerId
+
+            if (label === "Past events, then future events") {
+
+                backupEventRetrievalFunction = getNextEventWithTrackerId
+
+            }
+
+        }
+
+        initialEventRetrievalFunction(tracker.id)
+            .then(event => {
+
+                relevantEvent ??= event
+
+                if (!event && backupEventRetrievalFunction) {
+                    
+                    backupEventRetrievalFunction(tracker.id)
+                        .then(event => relevantEvent ??= event)
+                        .catch(error => console.error(error))
+
+                }
+
+                resolve(relevantEvent)
+
+            })
+            .catch(error => reject(error))
+
+    })
+
+}
+
 export async function putEvent(event) {
 
     const db = await openDatabase()

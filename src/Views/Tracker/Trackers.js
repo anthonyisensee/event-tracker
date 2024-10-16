@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { getAllTrackers, getLastEventWithTrackerId } from "../../IndexedDB/IndexedDB"
+import { getAllTrackers, getMostRelevantEventForTracker } from "../../IndexedDB/IndexedDB"
 import { Link } from "react-router-dom"
 import { timeSinceDateArray, getEventDate } from "../../DateHelperFunctions"
 
@@ -12,9 +12,9 @@ const Trackers = () => {
         getAllTrackers()
             .then(trackers => {
 
-                const latestEvents = trackers.map(tracker => getLastEventWithTrackerId(tracker.id))
+                const relevantEvent = trackers.map(tracker => getMostRelevantEventForTracker(tracker))
 
-                Promise.all(latestEvents)
+                Promise.all(relevantEvent)
                     .then(events => {
                         
                         const enrichedTrackers = []
@@ -38,7 +38,6 @@ const Trackers = () => {
 
     }, [])
 
-    // 
     useEffect(() => {
 
         // Don't do anything until trackers has been created 
