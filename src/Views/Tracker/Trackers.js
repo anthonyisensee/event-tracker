@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react"
-import { getAllTrackers, getMostRelevantEventForTracker } from "../../IndexedDB/IndexedDB"
+import { getAllTrackers } from "../../IndexedDB/IndexedDB"
 import { Link } from "react-router-dom"
-import { timeBetweenDates, getEventDate } from "../../DateHelperFunctions"
 import TrackerModel from "../../Models/TrackerModel"
 
 const Trackers = () => {
