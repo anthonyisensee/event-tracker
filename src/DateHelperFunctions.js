@@ -107,7 +107,7 @@ export function timeBetweenDates(firstDate, secondDate, onlyReturnLargestUnit = 
     if (inPresent) {
         return { 
             ...returnObject, 
-            times: [{ number: "Now", unit: "Time" }]
+            times: [{ number: "🛇", unit: "time" }]
         }
     }
     

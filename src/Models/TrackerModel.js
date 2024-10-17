@@ -1,4 +1,4 @@
-export default class Tracker {
+export default class TrackerModel {
 
     constructor() {
 

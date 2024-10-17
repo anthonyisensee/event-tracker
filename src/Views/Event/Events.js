@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { getAllEvents, getAllTrackers } from "../../IndexedDB/IndexedDB"
 import { Link } from "react-router-dom"
-import { getEventDate, timeSinceDateArray } from "../../DateHelperFunctions"
+import { getEventDate, timeBetweenDates } from "../../DateHelperFunctions"
 
 const Events = () => {
 
@@ -27,7 +27,7 @@ const Events = () => {
                             enrichedEvents.push({
                                 ...event,
                                 trackerName: trackerNames[event.trackerId],
-                                timeSinceDateArray: timeSinceDateArray(getEventDate(event))
+                                timeBetween: timeBetweenDates(getEventDate(event))
                             })
 
                         })
@@ -59,7 +59,7 @@ const Events = () => {
 
                     return {
                         ...event,
-                        timeSinceDateArray: timeSinceDateArray(getEventDate(event))
+                        timeBetween: timeBetweenDates(getEventDate(event))
                     }
 
                 })
@@ -75,6 +75,28 @@ const Events = () => {
 
     }, [events])
 
+    const getRelevantEventTableData = (event) => {
+
+        let shortenedTimeString
+        
+        if (event.timeBetween.inPresent) {
+
+            shortenedTimeString = "Now"
+            
+        } else if (event.timeBetween.inPast) {
+            
+            shortenedTimeString = `${event.timeBetween.times[0].number} ${event.timeBetween.times[0].unit} ago`
+            
+        } else if (event.timeBetween.inFuture) {
+            
+            shortenedTimeString = `${event.timeBetween.times[0].number} ${event.timeBetween.times[0].unit} from now`
+
+        }
+
+        return <p>{shortenedTimeString}</p>
+
+    }
+
     return (
         <>
             <div className="content">
@@ -85,11 +107,11 @@ const Events = () => {
                     <thead>
                         <tr>
                             <th>Event</th>
-                            <th>Tracker</th>
                             <th>Date</th>
                             <th>Time</th>
-                            <th>Occurred</th>
+                            <th>When</th>
                             <th>Description</th>
+                            <th>Tracker</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -111,18 +133,14 @@ const Events = () => {
                             return (
                                 <tr key={index}>
                                     <td><Link to={`/event?id=${event.id}`}>Link</Link></td>
+                                    <td>{event.date}</td>
+                                    <td>{event.time}</td>
+                                    <td>{getRelevantEventTableData(event)}</td>
+                                    <td>{event.description}</td>
                                     <td>
                                         <Link to={`/tracker?id=${event.trackerId}`}>
                                             {event.trackerName ?? <span className="is-italic">Unnamed Tracker</span>}
                                         </Link>
-                                    </td>
-                                    <td>{event.date}</td>
-                                    <td>{event.time}</td>
-                                    <td>
-                                        {event.timeSinceDateArray[0].number} {event.timeSinceDateArray[0].unit} ago
-                                    </td>
-                                    <td>
-                                        {event.description ?? <span className="is-italic">No description.</span>}
                                     </td>
                                 </tr>
                             )
