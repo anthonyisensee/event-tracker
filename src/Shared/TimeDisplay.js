@@ -146,9 +146,9 @@ const TimeDisplay = ({ tracker, timesContainerClassName, timesClassName, unitsCl
     descriptionClassName = descriptionClassName ?? "is-size-6 mb-4"
 
     return (
-        <div>
+        <>
             {timeBetween && <>
-                <div className="has-text-centered is-flex is-justify-content-center">
+                <div className="has-text-centered is-flex is-justify-content-center is-flex-wrap-wrap">
                     {timeBetween.times.map((time, index) => (
                         <div className={timesContainerClassName} key={index}>
                             <p className={timesClassName}>{time.number}</p>
@@ -160,7 +160,7 @@ const TimeDisplay = ({ tracker, timesContainerClassName, timesClassName, unitsCl
                     <p>{buildDescription(displayEvent, timeBetween, tracker)}</p>
                 </div>
             </>}
-        </div>
+        </>
     )
 
 }
