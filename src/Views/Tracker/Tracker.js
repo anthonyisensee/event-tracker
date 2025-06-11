@@ -162,7 +162,7 @@ const Tracker = () => {
                 </div>
                 <TimeDisplay
                     tracker={tracker}
-                    timesContainerClassName={"mb-5 ml-5 mr-5"}
+                    timesContainerClassName={"mb-4 ml-4 mr-4"}
                     timesClassName={"is-size-3-mobile is-size-1 has-text-weight-bold"}
                     unitsClassName={"is-size-6-mobile is-size-5"}
                     descriptionClassName={"is-size-5-mobile is-size-4"}

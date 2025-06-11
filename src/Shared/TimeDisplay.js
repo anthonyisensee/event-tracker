@@ -150,7 +150,7 @@ const TimeDisplay = ({ tracker, timesContainerClassName, timesClassName, unitsCl
             {timeBetween && <>
                 <div className="has-text-centered is-flex is-justify-content-center is-flex-wrap-wrap">
                     {timeBetween.times.map((time, index) => (
-                        <div className={timesContainerClassName} key={index}>
+                        <div className={timesContainerClassName} key={index} style={{ minWidth: "4rem"}}>
                             <p className={timesClassName}>{time.number}</p>
                             <p className={unitsClassName}>{time.unit}</p>
                         </div>
